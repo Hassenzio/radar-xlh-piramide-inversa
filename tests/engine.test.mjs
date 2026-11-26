@@ -6,104 +6,94 @@ const require = createRequire(import.meta.url);
 const PyramidEngine = require('../assets/pyramid-engine.js');
 const CasesData = require('../assets/cases-registry.js');
 
-const { validateCaseSchema, createSession, CANONICAL_DOMAINS } = PyramidEngine;
+const { validateCaseSchema, createSession, getDisplayTiles } = PyramidEngine;
 const { CASES_REGISTRY } = CasesData;
 
-const calibrationCase = CASES_REGISTRY.find((c) => c.meta.id === 'calibration-xlh-pathway');
-const slot01Case = CASES_REGISTRY.find((c) => c.meta.id === 'case-01-slot');
+const caso202 = CASES_REGISTRY.find((c) => c.meta.id === 'caso-202-xlh-pregresso');
+const slotNext = CASES_REGISTRY.find((c) => c.meta.id === 'caso-successivo-slot');
 
-test('CANONICAL_DOMAINS covers the 6 required decision categories in order', () => {
-  assert.equal(CANONICAL_DOMAINS.length, 6);
-  assert.deepEqual(
-    CANONICAL_DOMAINS.map((d) => d.domainKey),
-    ['comunicazionale', 'investigativa', 'gestionale', 'diagnostica', 'terapeutica', 'followup']
+test('CASO_202 passes validation with 5 steps, 1->2->3->4->5 snodi (15) and 53 decision tiles', () => {
+  const res = validateCaseSchema(caso202);
+  assert.equal(res.valid, true);
+  assert.equal(res.isPending, false);
+  assert.deepEqual(res.errors, []);
+  assert.equal(res.summary.stepsCount, 5);
+  assert.equal(res.summary.snodiCount, 15);
+  assert.equal(res.summary.totalDecisionTiles, 53);
+  assert.equal(res.summary.maxPossibleScore, 1500);
+
+  const snodiCounts = caso202.steps.map((s) => s.snodi.length);
+  assert.deepEqual(snodiCounts, [1, 2, 3, 4, 5]);
+
+  const tileCountsPerStep = caso202.steps.map((s) =>
+    s.snodi.reduce((sum, sn) => sum + sn.tiles.length, 0)
   );
+  assert.deepEqual(tileCountsPerStep, [2, 6, 9, 16, 20]);
 });
 
-test('CALIBRATION_CASE passes schema validation with 1->2->3->4->5->6->7 pyramid (28 tiles)', () => {
-  const result = validateCaseSchema(calibrationCase);
-  assert.equal(result.valid, true);
-  assert.equal(result.isPending, false);
-  assert.deepEqual(result.errors, []);
-  assert.equal(result.summary.defaultTilesCount, 28);
-  assert.equal(result.summary.maxPossibleScore, 1350);
-
-  const rowCounts = calibrationCase.levels.map((l) => l.nodesByBranch.default.tiles.length);
-  assert.deepEqual(rowCounts, [2, 3, 4, 5, 6, 7]);
+test('NEXT_CASE_SLOT is recognized as pending slot', () => {
+  const res = validateCaseSchema(slotNext);
+  assert.equal(res.valid, true);
+  assert.equal(res.isPending, true);
 });
 
-test('CASE_01_SLOT is recognized as valid pending slot', () => {
-  const result = validateCaseSchema(slot01Case);
-  assert.equal(result.valid, true);
-  assert.equal(result.isPending, true);
+test('getDisplayTiles deterministically varies correct answer position across snodi', () => {
+  const correctIndices = [];
+  caso202.steps.forEach((step) => {
+    step.snodi.forEach((snodo) => {
+      const shuffled = getDisplayTiles(snodo);
+      assert.equal(shuffled.length, snodo.tiles.length);
+      correctIndices.push(shuffled.findIndex((t) => t.isCorrect));
+    });
+  });
+  const uniquePositions = new Set(correctIndices);
+  assert.ok(uniquePositions.size >= 2, `Expected varied positions, got ${[...uniquePositions]}`);
 });
 
-test('Optimal path maintains 100% Quality Coefficient and earns 1350 points', () => {
-  const session = createSession(calibrationCase);
+test('All-correct run across 15 snodi maintains 100% CQ and earns 1500 pt', () => {
+  const session = createSession(caso202);
   assert.equal(session.getSnapshot().qualityPct, 100);
-  assert.equal(session.getSnapshot().activeLevel, 1);
+  assert.equal(session.getSnapshot().activeStep, 1);
 
-  const optimalIds = ['l1-a', 'l2-a', 'l3-a', 'l4-a', 'l5-a', 'l6-a'];
-  optimalIds.forEach((tileId, idx) => {
-    const res = session.selectTile(idx + 1, tileId);
-    assert.equal(res.appliedQualityDelta, 0);
-    assert.equal(res.qualityAfter, 100);
-    assert.equal(res.advanced, true);
+  caso202.steps.forEach((step) => {
+    step.snodi.forEach((snodo) => {
+      const correctTile = snodo.tiles.find((t) => t.isCorrect);
+      const out = session.selectTile(snodo.snodoId, correctTile.id);
+      assert.equal(out.record.qualityDeltaPct, 0);
+      assert.equal(out.record.qualityAfter, 100);
+    });
   });
 
   const report = session.getFinalReport();
   assert.equal(report.completed, true);
   assert.equal(report.finalQualityPct, 100);
-  assert.equal(report.totalValueScore, 1350);
-  assert.equal(report.optimalCount, 6);
-  assert.equal(report.errorAttemptsCount, 0);
+  assert.equal(report.totalValueScore, 1500);
+  assert.equal(report.correctCount, 15);
+  assert.equal(report.errorCount, 0);
   assert.equal(report.passedThreshold, true);
 });
 
-test('Error selection deducts % CQ and triggers different pre-choice narrative branch', () => {
-  const session = createSession(calibrationCase);
-  const res1 = session.selectTile(1, 'l1-b'); // -15% CQ -> rushed_comm branch
-  assert.equal(res1.appliedQualityDelta, -15);
-  assert.equal(res1.qualityAfter, 85);
-  assert.equal(res1.nextLevel, 2);
+test('Step 1 error S1-COM-B (-15% CQ) changes Step 2 pre-choice evolution narrative and clamps cumulative errors', () => {
+  const session = createSession(caso202);
+  const res1 = session.selectTile('s1-1', 'S1-COM-B');
+  assert.equal(res1.record.qualityAfter, 85);
+  assert.equal(res1.stepAdvanced, true);
+  assert.equal(session.getSnapshot().activeStep, 2);
 
-  const level2Node = session.getNodeForLevel(2);
-  assert.equal(session.getBranchKeyForLevel(2), 'rushed_comm');
-  assert.match(level2Node.preChoiceEvolution.headline, /Minimizzazione Iniziale/i);
+  const evoStep2 = session.getStepPreChoiceEvolution(2);
+  assert.match(evoStep2.narrative, /disorientato per la minimizzazione/i);
 
-  const res2 = session.selectTile(2, 'l2-rc-c'); // -20% CQ -> partial_workup branch
-  assert.equal(res2.qualityAfter, 65);
-  assert.equal(session.getBranchKeyForLevel(3), 'partial_workup');
-
-  session.selectTile(3, 'l3-pw-d'); // -20% -> 45%
-  session.selectTile(4, 'l4-c'); // -16% -> 29%
-  session.selectTile(5, 'l5-f'); // -20% -> 9%
-  session.selectTile(6, 'l6-d'); // -20% -> clamped to 0%
+  // Choose worst errors across remaining 14 snodi to verify clamping at 0%
+  caso202.steps.slice(1).forEach((step) => {
+    step.snodi.forEach((snodo) => {
+      const wrongTile = snodo.tiles.find((t) => !t.isCorrect);
+      session.selectTile(snodo.snodoId, wrongTile.id);
+    });
+  });
 
   const report = session.getFinalReport();
   assert.equal(report.completed, true);
   assert.equal(report.finalQualityPct, 0);
   assert.equal(report.passedThreshold, false);
-  assert.equal(report.errorAttemptsCount, 6);
-});
-
-test('Retry-gate mode (advanceOnSelect: false) does not advance and prevents double penalty on same tile', () => {
-  const gatedCase = structuredClone(calibrationCase);
-  gatedCase.meta.id = 'gated-test';
-  gatedCase.levels[0].nodesByBranch.default.tiles[1].advanceOnSelect = false;
-
-  const session = createSession(gatedCase);
-  const firstErr = session.selectTile(1, 'l1-b');
-  assert.equal(firstErr.advanced, false);
-  assert.equal(firstErr.qualityAfter, 85);
-  assert.equal(session.getSnapshot().activeLevel, 1);
-
-  const repeatErr = session.selectTile(1, 'l1-b');
-  assert.equal(repeatErr.alreadyPenalized, true);
-  assert.equal(repeatErr.appliedQualityDelta, 0);
-  assert.equal(repeatErr.qualityAfter, 85);
-
-  const recover = session.selectTile(1, 'l1-a');
-  assert.equal(recover.advanced, true);
-  assert.equal(recover.nextLevel, 2);
+  assert.equal(report.errorCount, 15);
 });

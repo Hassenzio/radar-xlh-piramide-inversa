@@ -1,12 +1,8 @@
 /* ═══════════════════════════════════════════════════════════════════════
    RADAR XLH — Registro Casi Clinici Piramide Inversa
-   Contiene:
-   1. calibration-xlh-pathway: Motore calibrato sui 6 snodi canonici con
-      geometria piramidale completa (1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 post-it),
-      diramazioni narrative Sliding Doors ed esclusivamente concetti
-      scientifici verificati dal dossier ufficiale FaD RADAR XLH.
-   2. case-01-slot: Slot predisposto per il Caso Clinico #01 della Faculty.
-   3. CASE_JSON_TEMPLATE: Schema di riferimento pronto per l'import/innesto.
+   Contiene il Caso Clinico #01 ufficiale trascritto integralmente da:
+   input/RADAR XLH/2.02 Caso Clinico Pregresso XLH.md
+   (Paziente: Matteo, 26 anni · 5 Step · 15 Snodi 1->2->3->4->5 · 53 Post-it)
    Compatibile con Browser (window.RADAR_CASES_DATA) e Node.js (CommonJS).
    ═══════════════════════════════════════════════════════════════════════ */
 
@@ -19,794 +15,834 @@
 })(typeof globalThis !== 'undefined' ? globalThis : this, function () {
   'use strict';
 
-  const CALIBRATION_CASE = {
+  const CASO_202_MATTEO = {
     meta: {
-      id: 'calibration-xlh-pathway',
-      code: 'CALIB-XLH-00',
-      title: 'Percorso Metodologico XLH — Calibrazione Motore a Piramide Inversa',
-      subtitle: 'Ambiente interattivo di calibrazione basato sui concetti clinici ufficiali RADAR XLH (in attesa del Caso Clinico #01 dalla Faculty)',
-      isCalibration: true,
+      id: 'caso-202-xlh-pregresso',
+      code: 'CASO 2.02',
+      title: 'XLH con Patologia Pregressa — Matteo, 26 anni',
+      subtitle: 'Caso clinico interattivo narrativo a 5 Step (1 → 2 → 3 → 4 → 5 snodi) su continuità assistenziale dell’adulto, team multidisciplinare e mappatura familiare',
       status: 'active',
-      authors: 'Governance Scientifica RADAR XLH · Architettura Didattica',
+      isCalibration: false,
+      authors: 'Governance Scientifica RADAR XLH · Script Ufficiale 2.02',
       targetSpecialties: [
-        'Pediatri di Libera Scelta (PLS)',
-        'Medici di Medicina Generale (MMG)',
-        'Odontoiatri',
+        'MMG',
+        'Endocrinologi',
+        'Nefrologi',
         'Ortopedici',
         'Fisiatri',
-        'Endocrinologi',
-        'Nefrologi'
+        'Odontoiatri',
+        'Pediatri'
       ],
       initialQualityPct: 100,
       passThresholdPct: 75,
-      sourceReference: 'FaD RADAR XLH — Presentazione Iniziativa & Razionale Scientifico (FORUM pro S.r.l., ID 95)'
+      sourceReference: '2.02 Caso Clinico Pregresso XLH (Matteo, 26 anni)'
     },
+
     apex: {
-      code: 'VERTICE · T0',
-      badge: 'Modalità Calibrazione Motore · Percorso Ufficiale XLH',
-      title: 'Inquadramento Iniziale: Dal Sospetto Territoriale alla Gestione XLH',
-      patientSummary: 'Questo scenario verifica l’intera meccanica a Piramide Inversa (1 → 2 → 3 → 4 → 5 → 6 → 7 Post-it, 6 snodi clinici, narrazione evolutiva pre-scelta e decurtazione % del Coefficiente di Qualità). I contenuti clinici utilizzano esclusivamente il razionale scientifico ufficiale RADAR XLH.',
-      clinicalParameters: [
-        { label: 'Asse Fisiopatologico', value: 'PHEX → ↑ FGF23', flag: 'core' },
-        { label: 'Target Renale', value: 'Inibizione NPT2a', flag: 'alert' },
-        { label: 'Vitamina D Attiva', value: '↓ 1,25(OH)2D', flag: 'alert' },
-        { label: 'Ereditarietà', value: 'X‑Linked Dominante', flag: 'info' },
-        { label: 'Coefficiente Qualità Iniziale', value: '100%', flag: 'ok' }
+      code: 'STEP 0 · APICE DELLA PIRAMIDE',
+      badge: 'Caso Clinico Ufficiale · Matteo, 26 anni',
+      title: 'Inquadramento Iniziale & Briefing Narrativo d’Ingresso',
+      briefingQuotes: [
+        '“Sei il medico di riferimento chiamato a riprendere in mano una storia clinica rimasta a metà. Matteo ha 26 anni ed è un ragazzo che da bambino ha affrontato una diagnosi precoce di XLH, una scoliosi lombare, episodi ricorrenti di ascessi dentali, una frattura del coccige e persino l’intervento per una malformazione di Chiari tipo I, ma che ora – entrato nell’età adulta – rischia di perdersi tra visite frammentate, dolore, rigidità e la convinzione che il capitolo difficile appartenga ormai solo al passato.”',
+        '“Nel percorso reale di chi vive con XLH, l’uscita dall’età pediatrica o l’interruzione del follow-up espongono a diagnosi o inquadramenti incompleti, passaggi multipli tra specialisti e conseguenze che restano attive per tutta la vita. Ogni scelta che farai su questa piramide non è un semplice clic: muoverà il Coefficiente di Qualità (CQ) a partire dal 100% e deciderà se Matteo troverà finalmente una regia clinica continua o se resterà intrappolato nelle criticità del percorso.”'
       ],
-      narrativeIntro: 'L’Ipofosfatemia Legata all’X (XLH) è un rachitismo/osteomalacia ereditaria rara caratterizzata da ipofosfatemia cronica con perdita renale di fosfato. La diagnosi tempestiva dipende in misura decisiva dalle figure specialistiche periferiche (PLS, MMG, odontoiatri, ortopedici e fisiatri) prima che si sviluppino deformità scheletriche gravi. Scendi lungo i 6 snodi della piramide inversa per testare l’evoluzione narrativa e l’impatto di ogni scelta sul Coefficiente di Qualità (%).',
-      startPrompt: 'Snodo 1 già pronto qui sotto: seleziona un Post-it del livello Comunicazionale per iniziare la discesa.'
+      clinicalParameters: [
+        { label: 'Paziente', value: 'Matteo, Maschio, 26 anni', flag: 'info' },
+        { label: 'Diagnosi XLH', value: 'A 6 mesi · Variante PHEX', flag: 'core' },
+        { label: 'Familiarità', value: 'Materna (X‑Linked)', flag: 'info' },
+        { label: 'Storia Pregressa', value: 'Scoliosi · Ascessi · Coccige · Chiari I', flag: 'alert' },
+        { label: 'Stato Attuale', value: 'Dolore, rigidità, follow-up interrotto', flag: 'alert' }
+      ],
+      sections: [
+        {
+          heading: 'Dati anagrafici, diagnosi e familiarità',
+          items: [
+            'Paziente maschio, 26 anni (fascia adulta 26–49 anni), in fase di continuità/transizione dall’età pediatrica all’età adulta, con XLH nota e pregressa patologia clinica documentata.',
+            'Diagnosi posta a 6 mesi di vita con alterazioni biochimiche caratteristiche, variante del gene PHEX (perdita di funzione con eccesso di FGF23, perdita renale di fosfato e ipofosfatemia cronica) e familiarità materna per rachitismo ipofosfatemico (trasmissione legata al cromosoma X).'
+          ]
+        },
+        {
+          heading: 'Anamnesi patologica remota e pregressa',
+          items: [
+            'Scoliosi lombare a convessità sinistra.',
+            'Ascessi dentali ricorrenti (legati a scarsa mineralizzazione della dentina e rischio di infezioni endodontiche/parodontali).',
+            'Frattura del coccige a 10 anni.',
+            'Malformazione di Chiari tipo I diagnosticata a 10 anni e sottoposta a intervento chirurgico a 11 anni.',
+            'Pregresso inquadramento/trattamento in età pediatrica (tra i 6 mesi e i 12 anni), con rischio tipico di interruzione o discontinuità del follow-up/terapia nel passaggio all’età adulta.'
+          ]
+        },
+        {
+          heading: 'Stato clinico attuale e fattori gestionali indispensabili',
+          items: [
+            'Condizione cronica e progressiva che dura tutta la vita, con esiti/manifestazioni pregresse e sintomi attivi nell’adulto (dolore muscoloscheletrico, rigidità, limitazione della mobilità e della funzionalità quotidiana).',
+            'Necessità di raccogliere anamnesi aggiornata, esami biochimici/radiologici/genetici appropriati, coordinamento multidisciplinare guidato da uno specialista in malattie metaboliche dell’osso, valutazione delle esigenze individuali e attenzione al family mapping / consulenza genetica.'
+          ]
+        }
+      ]
     },
-    levels: [
-      /* ══════════════════ LIVELLO 1 — COMUNICAZIONALE (2 POST-IT) ══════════════════ */
+
+    steps: [
+      /* ══════════════════ STEP 1 — 1 SNODO (2 POST-IT) ══════════════════ */
       {
-        level: 1,
-        domainKey: 'comunicazionale',
-        domainLabel: 'Scelta Comunicazionale',
-        nodesByBranch: {
+        stepNumber: 1,
+        title: 'Primo Avanzamento',
+        preChoiceEvolutionByBranch: {
           default: {
-            complexityRank: 1,
-            stageMaxValue: 100,
-            preChoiceEvolution: {
-              headline: 'T1 · Primo Contatto in Ambulatorio Territoriale (Sentinella)',
-              narrative: 'Durante una valutazione ambulatoriale emergono segnali clinici compatibili con un possibile disturbo del metabolismo fosfo‑calcico (in età pediatrica: gambe arcuate, bassa statura, disturbi della deambulazione o ascessi dentari spontanei; nell’adulto: dolore muscolo-scheletrico cronico, entesopatie o anomalie dentarie non cariose). Il paziente o i genitori attendono indicazioni su come proseguire.',
-              clinicalUpdates: [
-                { label: 'Contesto', value: 'Primo contatto specialistico periferico (Sentinella)' },
-                { label: 'Obiettivo Comunicazionale', value: 'Attivare alleanza diagnostica e raccogliere anamnesi familiare' }
-              ],
-              decisionPrompt: 'Come imposti il colloquio iniziale prima di programmare gli accertamenti?'
-            },
+            headline: 'Aggiornamento Narrativo Evolutivo (Prima della Scelta)',
+            narrative: 'Matteo (26 anni) entra in ambulatorio camminando con rigidità e riferendo dolore osseo/muscoloscheletrico che gli rende faticosi gli spostamenti quotidiani. Porta con sé il ricordo di una cartella pediatrica complessa – diagnosi a 6 mesi con variante PHEX e familiarità materna, scoliosi lombare, ascessi dentali ricorrenti, frattura del coccige a 10 anni e intervento per Chiari tipo I a 11 anni – ma ammette di aver diradato/interrotto i controlli pensando che, superata la crescita, il problema fosse alle spalle.'
+          }
+        },
+        snodi: [
+          {
+            snodoId: 's1-1',
+            snodoCode: '1.1',
+            domainKey: 'comunicazionale',
+            domainLabel: 'Scelta Comunicazionale',
+            valueWeight: 100,
             tiles: [
               {
-                id: 'l1-a',
-                code: 'L1-A',
-                shortTitle: 'Colloquio strutturato con alleanza diagnostica e anamnesi mirata',
-                clinicalTag: 'Comunicazione Efficace',
-                bodyText: 'Spieghi con chiarezza e senza allarmismo perché è utile approfondire i segni osservati, raccogli una storia accurata su dolore, affaticabilità, episodi dentari e possibili casi analoghi in famiglia, e condividi la necessità di esami ematochimici mirati.',
-                outcomeType: 'optimal',
+                id: 'S1-COM-A',
+                headline: 'Validare i sintomi attuali e chiarire che l’XLH prosegue nell’età adulta',
+                bodyText: 'Riconoscere dolore, rigidità e fatica nella mobilità quotidiana e spiegare che l’XLH è una malattia progressiva che dura tutta la vita, richiedendo continuità assistenziale anche dopo l’infanzia.',
+                isCorrect: true,
                 qualityDeltaPct: 0,
                 valuePoints: 100,
-                advanceOnSelect: true,
-                nextBranchKey: 'default',
-                feedbackTitle: 'Alleanza clinica ed efficacia anamnestica',
-                feedbackRationale: 'Secondo il percorso RADAR XLH, la comunicazione chiara delle figure sentinella trasforma il sospetto iniziale in collaborazione attiva del paziente e consente di intercettare subito segnali familiari cruciali nella trasmissione X‑Linked dominante.',
-                patientImpact: 'Il paziente/famiglia aderisce al percorso di approfondimento senza ritardi e segnala elementi anamnestici utili per lo step investigativo.'
+                nextBranchKey: 'from_s1_a',
+                feedbackText: 'Corretto. Comprendere l’impatto dell’XLH nell’età adulta favorisce la consapevolezza della necessità di assistenza continuativa e contrasta l’interruzione del follow-up.',
+                evolutionImpact: 'Matteo si sente ascoltato, collega i disturbi attuali alla storia di XLH e accetta di approfondire il quadro.'
               },
               {
-                id: 'l1-b',
-                code: 'L1-B',
-                shortTitle: 'Rassicurazione generica senza anamnesi familiare né piano di rivalutazione',
-                clinicalTag: 'Sottovalutazione Segnali',
-                bodyText: 'Liquidare il quadro come semplice variazione costituzionale o disturbo aspecifico da crescita/sovraccarico, rassicurando genericamente senza esplorare la storia familiare né fissare un controllo clinico-laboratoristico.',
-                outcomeType: 'error',
+                id: 'S1-COM-B',
+                headline: 'Minimizzare dicendo che la fase critica era solo pediatrica',
+                bodyText: 'Rassicurare che, essendo ormai adulto a 26 anni, i vecchi episodi (scoliosi, denti, Chiari tipo I) non richiedono una presa in carico continuativa per XLH.',
+                isCorrect: false,
                 qualityDeltaPct: -15,
                 valuePoints: 0,
-                advanceOnSelect: true,
-                nextBranchKey: 'rushed_comm',
-                feedbackTitle: 'Errore comunicazionale — Ritardo di presa in carico (-15% CQ)',
-                feedbackRationale: 'La minimizzazione iniziale senza indagine anamnestica è una delle cause principali di ritardo diagnostico nell’XLH: i pazienti non riconosciuti o persi al follow-up sviluppano nel tempo deformità progressive, dolore cronico e perdita di fiducia nel percorso.',
-                patientImpact: 'La famiglia rimanda gli accertamenti per diversi mesi, tornando solo quando i sintomi diventano più invalidanti.'
+                nextBranchKey: 'from_s1_b',
+                feedbackText: 'Errato (-15% CQ). L’XLH dura tutta la vita e gli adulti affrontano sia le conseguenze pregresse sia manifestazioni ancora in corso; l’interruzione dei controlli nell’adulto è un errore critico.',
+                evolutionImpact: 'Matteo resta incerto e tende a sottovalutare il legame tra i sintomi attuali e la sua storia clinica.'
               }
             ]
           }
-        }
+        ]
       },
 
-      /* ══════════════════ LIVELLO 2 — INVESTIGATIVA / ESAMINAZIONE (3 POST-IT) ══════════════════ */
+      /* ══════════════════ STEP 2 — 2 SNODI (3 + 3 = 6 POST-IT) ══════════════════ */
       {
-        level: 2,
-        domainKey: 'investigativa',
-        domainLabel: 'Scelta Investigativa / Esaminazione',
-        nodesByBranch: {
+        stepNumber: 2,
+        title: 'Secondo Avanzamento',
+        preChoiceEvolutionByBranch: {
           default: {
-            complexityRank: 2,
-            stageMaxValue: 150,
-            preChoiceEvolution: {
-              headline: 'T2 · Ritorno con Adesione Completa: Impostazione del Workup',
-              narrative: 'Grazie al colloquio strutturato, il paziente ritorna puntualmente con i dettagli anamnestici familiari e chiede quali esami obiettivi e di laboratorio permettano di chiarire l’origine dei disturbi scheletrici e dentari.',
-              clinicalUpdates: [
-                { label: 'Aderenza Paziente', value: 'Alta · Disponibile a esame obiettivo e prelievo mirato' },
-                { label: 'Focus Clinico', value: 'Valutazione del fosfato sierico corretto per età e bilancio fosfo‑calcico' }
-              ],
-              decisionPrompt: 'Quale pacchetto investigativo e di esaminazione clinica attivi?'
-            },
+            headline: 'Aggiornamento Narrativo Evolutivo (Prima della Scelta)',
+            narrative: 'Matteo precisa la localizzazione del dolore e della rigidità, racconta l’impatto sulle attività quotidiane e ricorda i pregressi ascessi dentali, la scoliosi lombare, la frattura del coccige e l’intervento a 11 anni per malformazione di Chiari tipo I.'
+          },
+          from_s1_a: {
+            headline: 'Evoluzione dopo S1-COM-A · Adesione Consapevole',
+            narrative: 'Matteo dettagliatamente precisa la localizzazione del dolore e della rigidità, racconta l’impatto sulle attività quotidiane e ricorda i pregressi ascessi dentali, la scoliosi lombare, la frattura del coccige e l’intervento a 11 anni per malformazione di Chiari tipo I.'
+          },
+          from_s1_b: {
+            headline: 'Evoluzione dopo S1-COM-B · Persistenza Sintomatica nonostante Minimizzazione',
+            narrative: 'Matteo appare disorientato per la minimizzazione, ma insiste sul fatto che dolore, rigidità e ridotta mobilità pesano nella vita di tutti i giorni nonostante la storia pediatrica nota.'
+          }
+        },
+        snodi: [
+          {
+            snodoId: 's2-1',
+            snodoCode: '2.1',
+            domainKey: 'investigativa',
+            domainLabel: 'Scelta Investigativa / Esaminazione',
+            valueWeight: 100,
             tiles: [
               {
-                id: 'l2-a',
-                code: 'L2-A',
-                shortTitle: 'Esame obiettivo completo + Pannello fosfo‑calcico con Fosfato e TRP',
-                clinicalTag: 'Gold Standard Investigativo',
-                bodyText: 'Esegui esame obiettivo mirato (postura, deambulazione, cavo orale per ascessi non cariosi/difetti dello smalto) e richiedi fosfatemia (valutata rispetto ai range pediatrici/adulti), fosfaturia/riassorbimento tubulare di fosfato (TRP), fosfatasi alcalina, calcemia, PTH e 25(OH)D.',
-                outcomeType: 'optimal',
+                id: 'S2-INV-A',
+                headline: 'Anamnesi completa (personale, familiare, pregressa) ed esame clinico mirato',
+                bodyText: 'Integrare familiarità materna, storia pediatrica (diagnosi a 6 mesi, PHEX, scoliosi, denti, coccige, Chiari tipo I) con esame clinico su dolore, rigidità, mobilità, postura/deformità e sintomi correlati.',
+                isCorrect: true,
                 qualityDeltaPct: 0,
-                valuePoints: 150,
-                advanceOnSelect: true,
-                nextBranchKey: 'early_phosphate',
-                feedbackTitle: 'Il fosfato riconosciuto come biomarker centrale',
-                feedbackRationale: 'Come evidenziato dal Modulo 1 (Omeostasi minerale) e Modulo 2 di RADAR XLH, il fosfato sierico corretto per età unito al calcolo della perdita renale (TRP/TmP-GFR) e all’ALP permette di distinguere immediatamente una ipofosfatemia da perdita renale da altre cause.',
-                patientImpact: 'Gli esami documentano subito ipofosfatemia con perdita renale di fosfato e iper-fosfatasi alcalina, aprendo la corsia rapida verso il Centro Esperto.'
+                valuePoints: 100,
+                feedbackText: 'Corretto. L’inquadramento richiede anamnesi personale/familiare ed esame clinico sistematico di segni, sintomi e storia clinica pregressa.'
               },
               {
-                id: 'l2-b',
-                code: 'L2-B',
-                shortTitle: 'Richiesta di sola Calcemia e 25(OH)D senza Fosfatemia né Fosfaturia',
-                clinicalTag: 'Pannello Incompleto',
-                bodyText: 'Prescrivi esami di routine con calcemia e vitamina D 25(OH)D per escludere un comune rachitismo carenziale o osteomalacia semplice, tralasciando il dosaggio del fosfato sierico e urinario.',
-                outcomeType: 'acceptable',
-                qualityDeltaPct: -6,
-                valuePoints: 90,
-                advanceOnSelect: true,
-                nextBranchKey: 'partial_workup',
-                feedbackTitle: 'Workup parziale — Fosfato omesso (-6% CQ)',
-                feedbackRationale: 'Nell’XLH calcemia e 25(OH)D risultano frequentemente nella norma: fermarsi a questi parametri senza dosare la fosfatemia (e valutare i range per età) maschera il difetto principale di mineralizzazione.',
-                patientImpact: 'I primi esami appaiono falsamente rassicuranti su calcio e 25(OH)D; è necessario un secondo prelievo per chiarire il quadro.'
-              },
-              {
-                id: 'l2-c',
-                code: 'L2-C',
-                shortTitle: 'Supplementazione empirica con Vitamina D senza esami fosfo‑calcici',
-                clinicalTag: 'Errore Metodologico',
-                bodyText: 'Avvii direttamente vitamina D orale ad alto dosaggio ex juvantibus senza eseguire prelievo per fosfatemia, fosfatasi alcalina e parametri renali.',
-                outcomeType: 'error',
-                qualityDeltaPct: -18,
+                id: 'S2-INV-B',
+                headline: 'Esaminare solo il distretto doloroso del momento ignorando anamnesi familiare e storia pregressa',
+                bodyText: 'Trattare il caso come un episodio isolato.',
+                isCorrect: false,
+                qualityDeltaPct: -10,
                 valuePoints: 0,
-                advanceOnSelect: true,
-                nextBranchKey: 'partial_workup',
-                feedbackTitle: 'Errore investigativo — Terapia empirica alla cieca (-18% CQ)',
-                feedbackRationale: 'La terapia empirica con sola vitamina D nativa non corregge la perdita renale di fosfato mediata da FGF23 e ritarda l’inquadramento biochimico corretto.',
-                patientImpact: 'I sintomi persistono invariati nonostante la supplementazione, aggravando il ritardo diagnostico.'
+                feedbackText: 'Errato (-10% CQ). Ignorare familiarità legata all’X, variante PHEX e pregresse manifestazioni scheletriche/dentali/neurologiche fa perdere elementi chiave del quadro.'
+              },
+              {
+                id: 'S2-INV-C',
+                headline: 'Rimandare l’esame clinico e l’aggiornamento anamnestico a un controllo generico futuro',
+                bodyText: 'Non approfondire ora.',
+                isCorrect: false,
+                qualityDeltaPct: -10,
+                valuePoints: 0,
+                feedbackText: 'Errato (-10% CQ). Ritardare l’inquadramento e il trattamento può determinare esiti clinici peggiori e conseguenze per tutta la vita.'
               }
             ]
           },
-          rushed_comm: {
-            complexityRank: 2,
-            stageMaxValue: 150,
-            preChoiceEvolution: {
-              headline: 'T2 · Evoluzione dopo Minimizzazione Iniziale: Riacutizzazione Sintomi',
-              narrative: 'A seguito della rassicurazione generica al T1, la famiglia si ripresenta dopo 6 mesi perché la limitazione funzionale, l’affaticabilità e gli episodi dolorosi/dentari si sono accentuati. Ora è indispensabile recuperare tempestività nell’esaminazione.',
-              clinicalUpdates: [
-                { label: 'Evoluzione Negativa', value: 'Ritardo accumulato di 6 mesi · Peggioramento tolleranza allo sforzo' },
-                { label: 'Priorità Clinica', value: 'Recupero immediato tramite profilo biochimico fosfo‑calcico completo' }
-              ],
-              decisionPrompt: 'Come procedi ora nell’esaminazione e negli esami di laboratorio?'
-            },
+          {
+            snodoId: 's2-2',
+            snodoCode: '2.2',
+            domainKey: 'diagnostica',
+            domainLabel: 'Scelta Diagnostica',
+            valueWeight: 100,
             tiles: [
               {
-                id: 'l2-rc-a',
-                code: 'L2-A',
-                shortTitle: 'Recupero diagnostico: Esame obiettivo mirato + Fosfato, TRP e ALP',
-                clinicalTag: 'Recupero Tempestivo',
-                bodyText: 'Rivaluti sistematicamente apparato muscolo-scheletrico e cavo orale e richiedi subito pannello completo con fosfatemia per età, fosfaturia/TRP, ALP, calcemia, PTH e 25(OH)D.',
-                outcomeType: 'optimal',
+                id: 'S2-DIA-A',
+                headline: 'Valutazione biochimica mirata, verifica genetica/FGF23 e imaging appropriato',
+                bodyText: 'Valutare fosfato sierico e perdita renale di fosfato, parametri biochimici associati (ALP/BALP, calcio, PTH, FGF23 se indicato), conferma genetica (PHEX) quando possibile e imaging mirato sulle aree clinicamente rilevanti.',
+                isCorrect: true,
                 qualityDeltaPct: 0,
-                valuePoints: 150,
-                advanceOnSelect: true,
-                nextBranchKey: 'early_phosphate',
-                feedbackTitle: 'Inversione di rotta efficace',
-                feedbackRationale: 'L’inserimento mirato di fosfatemia, ALP e valutazione del riassorbimento tubulare di fosfato consente di recuperare il ritardo accumulato e identificare l’ipofosfatemia renale.',
-                patientImpact: 'Il laboratorio mostra finalmente il segnale chiave di perdita renale di fosfato.'
+                valuePoints: 100,
+                feedbackText: 'Corretto. La diagnosi combina caratteristiche cliniche, biochimiche, radiografiche e genetiche, con conferma genetica quando possibile.'
               },
               {
-                id: 'l2-rc-b',
-                code: 'L2-B',
-                shortTitle: 'Sola radiografia distrettuale con Calcemia/25(OH)D senza Fosfato',
-                clinicalTag: 'Esaminazione Incompleta',
-                bodyText: 'Esegui solo un controllo radiografico locale e dosi calcemia e 25(OH)D, rimandando ancora il pannello del fosfato.',
-                outcomeType: 'acceptable',
-                qualityDeltaPct: -8,
-                valuePoints: 75,
-                advanceOnSelect: true,
-                nextBranchKey: 'partial_workup',
-                feedbackTitle: 'Segnale biochimico ancora non intercettato (-8% CQ)',
-                feedbackRationale: 'Senza fosfatemia e valutazione della perdita tubulare renale, i segni radiologici rischiano di essere attribuiti erroneamente a carenza nutrizionale o sovraccarico meccanico.',
-                patientImpact: 'Permane incertezza diagnostica e necessità di ulteriore rivalutazione.'
-              },
-              {
-                id: 'l2-rc-c',
-                code: 'L2-C',
-                shortTitle: 'Invio a fisioterapia sintomatica senza alcun approfondimento biochimico',
-                clinicalTag: 'Ritardo Critico',
-                bodyText: 'Prescrivi esclusivamente cicli fisioterapici antalgici o plantari senza esami ematochimici fosfo‑calcici.',
-                outcomeType: 'error',
-                qualityDeltaPct: -20,
+                id: 'S2-DIA-B',
+                headline: 'Richiedere solo un controllo generico del calcio senza valutare fosfato o perdita renale',
+                bodyText: 'Limitarsi a un parametro parziale.',
+                isCorrect: false,
+                qualityDeltaPct: -10,
                 valuePoints: 0,
-                advanceOnSelect: true,
-                nextBranchKey: 'partial_workup',
-                feedbackTitle: 'Errore investigativo grave — Sintomo trattato senza causa (-20% CQ)',
-                feedbackRationale: 'Intervenire solo sul piano sintomatico meccanico in presenza di ipofosfatemia non diagnosticata espone a progressione delle deformità e pseudofratture.',
-                patientImpact: 'Il quadro osseo continua a deteriorarsi in assenza di diagnosi metabolica.'
+                feedbackText: 'Errato (-10% CQ). L’XLH è caratterizzata da perdita renale di fosfato e ipofosfatemia cronica guidata dall’eccesso di FGF23.'
+              },
+              {
+                id: 'S2-DIA-C',
+                headline: 'Non richiedere alcun esame diagnostico o strumentale',
+                bodyText: 'Affidarsi solo alla visita iniziale.',
+                isCorrect: false,
+                qualityDeltaPct: -15,
+                valuePoints: 0,
+                feedbackText: 'Errato (-15% CQ). L’inquadramento richiede una combinazione integrata di dati clinici, biochimici, radiografici e genetici.'
               }
             ]
           }
-        }
+        ]
       },
 
-      /* ══════════════════ LIVELLO 3 — GESTIONALE (4 POST-IT) ══════════════════ */
+      /* ══════════════════ STEP 3 — 3 SNODI (3 + 3 + 3 = 9 POST-IT) ══════════════════ */
       {
-        level: 3,
-        domainKey: 'gestionale',
-        domainLabel: 'Scelta Gestionale',
-        nodesByBranch: {
+        stepNumber: 3,
+        title: 'Terzo Avanzamento',
+        preChoiceEvolutionByBranch: {
           default: {
-            complexityRank: 3,
-            stageMaxValue: 200,
-            preChoiceEvolution: {
-              headline: 'T3 · Referto di Ipofosfatemia Cronica con Perdita Renale di Fosfato',
-              narrative: 'I risultati mostrano ipofosfatemia al di sotto del limite inferiore per età, ridotto riassorbimento tubulare di fosfato (TRP ridotto), fosfatasi alcalina elevata, calcemia normale e 25(OH)D adeguata. Il sospetto di patologia rara fosfo‑dismetabolica (XLH) è altamente fondato.',
-              clinicalUpdates: [
-                { label: 'Fosfatemia', value: 'Ridotta per età · Perdita renale documentata (↓ TRP)' },
-                { label: 'Calcemia / 25(OH)D', value: 'Nella norma · ↑ Fosfatasi Alcalina' }
-              ],
-              decisionPrompt: 'Quale decisione gestionale e di network di referral attui a questo snodo?'
-            },
+            headline: 'Aggiornamento Narrativo Evolutivo (Prima della Scelta)',
+            narrative: 'I dati raccolti confermano un adulto di 26 anni con storia nota di XLH (diagnosi a 6 mesi, variante PHEX, familiarità materna) e anamnesi pregressa di scoliosi lombare, ascessi dentali ricorrenti, frattura del coccige a 10 anni e Chiari tipo I operato a 11 anni, ora alle prese con sintomi cronici e la necessità di evitare percorsi frammentati o passaggi dispersivi tra specialisti.'
+          }
+        },
+        snodi: [
+          {
+            snodoId: 's3-1',
+            snodoCode: '3.1',
+            domainKey: 'gestionale',
+            domainLabel: 'Scelta Gestionale',
+            valueWeight: 100,
             tiles: [
               {
-                id: 'l3-a',
-                code: 'L3-A',
-                shortTitle: 'Referral strutturato al Centro Specialistico Malattie Rare/Metabolismo Osseo',
-                clinicalTag: 'Network RADAR XLH Ottimale',
-                bodyText: 'Attivi il referral rapido verso il Centro di Riferimento multidisciplinare (endocrinologia/nefrologia/pediatria metabolica ossea), allegando il dossier completo (curva di crescita/sintomi, anamnesi familiare, fosfatemia, TRP, ALP e segnalazioni dentarie/ortopediche).',
-                outcomeType: 'optimal',
+                id: 'S3-GES-A',
+                headline: 'Attivare un team multidisciplinare coordinato da uno specialista in malattie metaboliche dell’osso',
+                bodyText: 'Strutturare la presa in carico adulta con coordinamento centrale e coinvolgimento mirato delle altre aree (es. odontoiatria, reumatologia, terapia del dolore, fisioterapia, psicologia/salute mentale, neurochirurgia/consulenza genetica se indicato).',
+                isCorrect: true,
                 qualityDeltaPct: 0,
-                valuePoints: 200,
-                advanceOnSelect: true,
-                nextBranchKey: 'default',
-                feedbackTitle: 'Referral tempestivo e dossier completo',
-                feedbackRationale: 'Nel Modulo 4 (Mappatura e Network di Referral), la sentinella non sostituisce lo specialista ma anticipa il sospetto e indirizza il paziente con dati biochimici completi al centro appropriato.',
-                patientImpact: 'Il paziente accede al Centro Esperto in tempi brevi evitando peregrinazioni specialistiche frammentate.'
+                valuePoints: 100,
+                feedbackText: 'Corretto. I pazienti con XLH devono ricevere un’assistenza multidisciplinare organizzata da uno specialista esperto in malattie metaboliche dell’osso, con ulteriori aree attivate in base alle esigenze individuali.'
               },
               {
-                id: 'l3-b',
-                code: 'L3-B',
-                shortTitle: 'Invio al Centro Esperto senza allegare dati biochimici né anamnesi familiare',
-                clinicalTag: 'Referral Incompleto',
-                bodyText: 'Consigli genericamente al paziente di prenotare una visita specialistica di terzo livello senza relazione clinica di accompagnamento né referti fosfo‑calcici organizzati.',
-                outcomeType: 'acceptable',
-                qualityDeltaPct: -5,
-                valuePoints: 120,
-                advanceOnSelect: true,
-                nextBranchKey: 'default',
-                feedbackTitle: 'Indirizzo corretto ma coordinamento debole (-5% CQ)',
-                feedbackRationale: 'Il referral privo di documentazione biochimica e di sintesi anamnestica rallenta il triage specialistico e costringe spesso a ripetere accertamenti.',
-                patientImpact: 'Il paziente raggiunge il centro ma con allungamento dei tempi di presa in carico.'
-              },
-              {
-                id: 'l3-c',
-                code: 'L3-C',
-                shortTitle: 'Invio diretto a chirurgia ortopedica correttiva prima dell’inquadramento metabolico',
-                clinicalTag: 'Errore Gestionale',
-                bodyText: 'Indirizzi il paziente esclusivamente all’ortopedico per valutare un intervento correttivo meccanico sulle deformità, ignorando l’ipofosfatemia renale.',
-                outcomeType: 'error',
-                qualityDeltaPct: -16,
+                id: 'S3-GES-B',
+                headline: 'Lasciare il paziente a consultazioni scollegate senza un centro/specialista coordinatore',
+                bodyText: 'Replicare un percorso frammentato.',
+                isCorrect: false,
+                qualityDeltaPct: -10,
                 valuePoints: 0,
-                advanceOnSelect: true,
-                nextBranchKey: 'default',
-                feedbackTitle: 'Errore gestionale — Chirurgia su osso non mineralizzato (-16% CQ)',
-                feedbackRationale: 'Programmare interventi ortopedici correttivi senza aver prima diagnosticato e stabilizzato metabolicamente l’XLH espone ad alto rischio di recidiva delle deformità e complicanze.',
-                patientImpact: 'Il paziente rischia procedure invasive premature senza correzione della causa metabolica.'
+                feedbackText: 'Errato (-10% CQ). La frammentazione e la mancanza di coordinamento ostacolano una gestione continua ed efficace dell’adulto con XLH.'
               },
               {
-                id: 'l3-d',
-                code: 'L3-D',
-                shortTitle: 'Monitoraggio annuale passivo in attesa che i valori si normalizzino spontaneamente',
-                clinicalTag: 'Inerzia Clinica',
-                bodyText: 'Decidi di ripetere gli esami solo dopo 12 mesi senza avviare alcun percorso di referral specialistico.',
-                outcomeType: 'error',
-                qualityDeltaPct: -18,
+                id: 'S3-GES-C',
+                headline: 'Chiudere l’inquadramento senza un referente di continuità',
+                bodyText: 'Rimandare a future richieste spontanee.',
+                isCorrect: false,
+                qualityDeltaPct: -15,
                 valuePoints: 0,
-                advanceOnSelect: true,
-                nextBranchKey: 'default',
-                feedbackTitle: 'Errore gestionale — Attesa passiva dannosa (-18% CQ)',
-                feedbackRationale: 'L’XLH è una condizione cronica genetica che non si risolve spontaneamente: attendere 12 mesi con ipofosfatemia attiva aggrava rachitismo, dolore e rischio di complicanze dentarie/scheletriche.',
-                patientImpact: 'Progressione evitabile della malattia prima dell’accesso alle cure.'
+                feedbackText: 'Errato (-15% CQ). L’XLH è una malattia progressiva che dura tutta la vita e richiede continuità assistenziale.'
               }
             ]
           },
-          partial_workup: {
-            complexityRank: 3,
-            stageMaxValue: 200,
-            preChoiceEvolution: {
-              headline: 'T3 · Persistenza Sintomi dopo Workup Incompleto: Necessità di Riallineamento',
-              narrative: 'Calcemia e 25(OH)D risultano sostanzialmente nella norma, ma il paziente continua a riferire dolore osseo, limitazione motoria o ascessi dentari ricorrenti. Emerge la necessità di sbloccare lo stallo gestionale.',
-              clinicalUpdates: [
-                { label: 'Stato Percorso', value: 'Stallo diagnostico · Fosfato non ancora caratterizzato' },
-                { label: 'Rischio Attuale', value: 'Dispersione tra visite specialistiche non integrate' }
-              ],
-              decisionPrompt: 'Quale azione gestionale scegli per uscire dallo stallo?'
-            },
+          {
+            snodoId: 's3-2',
+            snodoCode: '3.2',
+            domainKey: 'diagnostica',
+            domainLabel: 'Scelta Diagnostica',
+            valueWeight: 100,
             tiles: [
               {
-                id: 'l3-pw-a',
-                code: 'L3-A',
-                shortTitle: 'Integrazione immediata di Fosfatemia/TRP e invio strutturato al Centro Esperto',
-                clinicalTag: 'Riallineamento Ottimale',
-                bodyText: 'Completi senza ulteriore indugio il profilo con fosfatemia per età, fosfaturia/TRP e ALP, e attivi il canale di referral verso il Centro Specialistico multidisciplinare.',
-                outcomeType: 'optimal',
+                id: 'S3-DIA-A',
+                headline: 'Integrare conferma genetica (PHEX) e valutazione biochimico-radiografica mirata',
+                bodyText: 'Valorizzare la conferma genetica quando possibile (e in assenza di analisi molecolare, storia familiare legata all’X, FGF23 non soppresso e ipofosfatemia) insieme alla valutazione delle manifestazioni cliniche/radiografiche.',
+                isCorrect: true,
                 qualityDeltaPct: 0,
-                valuePoints: 200,
-                advanceOnSelect: true,
-                nextBranchKey: 'default',
-                feedbackTitle: 'Percorso ricondotto al network RADAR XLH',
-                feedbackRationale: 'Integrare il fosfato e connettere subito la sentinella al centro prescrittore interrompe il pellegrinaggio diagnostico del paziente raro.',
-                patientImpact: 'Viene finalmente documentata la perdita renale di fosfato e avviata la presa in carico specialistica.'
-              },
-              {
-                id: 'l3-pw-b',
-                code: 'L3-B',
-                shortTitle: 'Consulenze specialistiche isolate (solo odontoiatra o solo fisiatra) senza regia',
-                clinicalTag: 'Gestione Frammentata',
-                bodyText: 'Invii il paziente a singoli specialisti d’organo per gestire solo il singolo sintomo (denti o dolore articolare) senza collegare i segni in una valutazione metabolica unitaria.',
-                outcomeType: 'acceptable',
-                qualityDeltaPct: -7,
                 valuePoints: 100,
-                advanceOnSelect: true,
-                nextBranchKey: 'default',
-                feedbackTitle: 'Frammentazione assistenziale (-7% CQ)',
-                feedbackRationale: 'Senza regia metabolica, ciascuno specialista tratta il proprio distretto ma la causa comune (asse PHEX‑FGF23) rimane invisibile.',
-                patientImpact: 'Solo l’integrazione successiva dei referti porterà al sospetto unitario.'
+                feedbackText: 'Corretto. La diagnosi combina dati clinici, biochimici, radiografici e genetici e dovrebbe essere confermata mediante test genetici ogni volta che è possibile.'
               },
               {
-                id: 'l3-pw-c',
-                code: 'L3-C',
-                shortTitle: 'Prescrizione di terapia antinfiammatoria cronica e scarico motorio prolungato',
-                clinicalTag: 'Gestione Palliativa Impropria',
-                bodyText: 'Imposti terapia sintomatica cronica con FANS senza approfondire l’ipofosfatemia né coinvolgere un centro specialistico.',
-                outcomeType: 'error',
-                qualityDeltaPct: -15,
+                id: 'S3-DIA-B',
+                headline: 'Sospendere ogni valutazione se non si dispone subito di un nuovo test genetico',
+                bodyText: 'Bloccare l’inquadramento.',
+                isCorrect: false,
+                qualityDeltaPct: -10,
                 valuePoints: 0,
-                advanceOnSelect: true,
-                nextBranchKey: 'default',
-                feedbackTitle: 'Errore gestionale — Mascheramento sintomatico (-15% CQ)',
-                feedbackRationale: 'L’uso cronico di analgesici non modifica la mineralizzazione ossea difettiva e ritarda ulteriormente la diagnosi eziologica.',
-                patientImpact: 'Esposizione a effetti collaterali farmacologici senza beneficio sulla malattia di base.'
+                feedbackText: 'Errato (-10% CQ). Se l’analisi genetica molecolare non è disponibile, la diagnosi è supportata da storia familiare X‑Linked, FGF23 non soppresso e ipofosfatemia.'
               },
               {
-                id: 'l3-pw-d',
-                code: 'L3-D',
-                shortTitle: 'Chiusura del caso per assenza di ipocalcemia',
-                clinicalTag: 'Errore Critico',
-                bodyText: 'Archivi il sospetto metabolico considerando normale il metabolismo minerale perché calcemia e 25(OH)D non sono alterate.',
-                outcomeType: 'error',
-                qualityDeltaPct: -20,
+                id: 'S3-DIA-C',
+                headline: 'Ignorare i dati biochimici e di storia familiare già presenti',
+                bodyText: 'Trattare il caso come una generica artrosi da usura.',
+                isCorrect: false,
+                qualityDeltaPct: -10,
                 valuePoints: 0,
-                advanceOnSelect: true,
-                nextBranchKey: 'default',
-                feedbackTitle: 'Errore critico — Falsa esclusione su calcemia normale (-20% CQ)',
-                feedbackRationale: 'Nell’XLH la calcemia è tipicamente normale; escludere un rachitismo/osteomalacia ipofosfatemica sulla base della sola calcemia è un errore classico da evitare.',
-                patientImpact: 'Il paziente resta non diagnosticato con perdita di anni utili di trattamento.'
+                feedbackText: 'Errato (-10% CQ). Il quadro clinico-anamnestico e biochimico depone per XLH e richiede un inquadramento coerente.'
               }
             ]
-          }
-        }
-      },
-
-      /* ══════════════════ LIVELLO 4 — DIAGNOSTICA (5 POST-IT) ══════════════════ */
-      {
-        level: 4,
-        domainKey: 'diagnostica',
-        domainLabel: 'Scelta Diagnostica',
-        nodesByBranch: {
-          default: {
-            complexityRank: 4,
-            stageMaxValue: 250,
-            preChoiceEvolution: {
-              headline: 'T4 · Valutazione al Centro Specialistico: Conferma Molecolare e Familiare',
-              narrative: 'Al Centro Esperto il quadro biochimico conferma ipofosfatemia cronica con perdita renale di fosfato (↓ TmP/GFR), ↑ FGF23 sierico inappropriatamente normale/elevato rispetto all’ipofosfatemia, 1,25(OH)2D ridotta/inappropriatamente bassa e PTH normale o lievemente mosso. Occorre chiudere la diagnosi e definire l’estensione familiare.',
-              clinicalUpdates: [
-                { label: 'Asse Patogenetico', value: '↑ FGF23 → inibizione NPT2a & 1α-idrossilasi' },
-                { label: 'Calcitriolo 1,25(OH)2D', value: 'Inappropriatamente ridotto · Stimolazione 24-idrossilasi' },
-                { label: 'Step Richiesto', value: 'Conferma diagnostica XLH + Mappatura Familiare' }
-              ],
-              decisionPrompt: 'Quale strategia diagnostica completa selezioni in questa fase?'
-            },
+          },
+          {
+            snodoId: 's3-3',
+            snodoCode: '3.3',
+            domainKey: 'comunicazionale',
+            domainLabel: 'Scelta Comunicazionale',
+            valueWeight: 100,
             tiles: [
               {
-                id: 'l4-a',
-                code: 'L4-A',
-                shortTitle: 'Diagnosi di XLH (test genetico PHEX) + Albero genealogico e screening familiare attivo',
-                clinicalTag: 'Diagnosi Completa & Pedigree',
-                bodyText: 'Confermi la diagnosi di Ipofosfatemia X‑Linked mediante analisi genetica del gene PHEX (escludendo forme secondarie o altre tubulopatie) e costruisci sistematicamente il pedigree su 3 generazioni per avviare lo screening biochimico-clinico dei familiari a rischio secondo le regole X‑Linked dominanti.',
-                outcomeType: 'optimal',
+                id: 'S3-COM-A',
+                headline: 'Collegare in modo chiaro fisiopatologia (loss-of-function PHEX / eccesso di FGF23) e vita adulta',
+                bodyText: 'Spiegare come l’alterazione del metabolismo del fosfato e la storia pregressa spieghino i sintomi attuali e la necessità di un percorso strutturato.',
+                isCorrect: true,
                 qualityDeltaPct: 0,
-                valuePoints: 250,
-                advanceOnSelect: true,
-                nextBranchKey: 'default',
-                feedbackTitle: 'Paziente indice moltiplicatore di diagnosi familiari',
-                feedbackRationale: 'Come insegnato nel Modulo 5 (Mappatura Famigliare), la trasmissione X‑Linked dominante implica che ogni paziente indice può svelare familiari non diagnosticati (madre, figlie, fratelli/sorelle secondo la linea di trasmissione).',
-                patientImpact: 'Diagnosi molecolare certa e identificazione precoce di altri membri della famiglia fino a quel momento misconosciuti.'
+                valuePoints: 100,
+                feedbackText: 'Corretto. Una spiegazione chiara rafforza la comprensione dell’impatto nell’età adulta e l’adesione al percorso.'
               },
               {
-                id: 'l4-b',
-                code: 'L4-B',
-                shortTitle: 'Diagnosi clinico-biochimica di XLH corretta, ma senza screening familiare',
-                clinicalTag: 'Mappatura Familiare Omessa',
-                bodyText: 'Confermi l’XLH sul singolo paziente con test PHEX, ma limiti l’intervento al paziente indice senza costruire l’albero genealogico né proporre screening ai consanguinei.',
-                outcomeType: 'acceptable',
-                qualityDeltaPct: -6,
-                valuePoints: 150,
-                advanceOnSelect: true,
-                nextBranchKey: 'default',
-                feedbackTitle: 'Diagnosi individuale corretta ma opportunità familiare persa (-6% CQ)',
-                feedbackRationale: 'Omettere il pedigree fa perdere il valore moltiplicativo dello screening familiare strutturato, lasciando potenzialmente esposti altri parenti sintomatici.',
-                patientImpact: 'Il paziente indice è diagnosticato, ma eventuali familiari affetti restano senza inquadramento.'
-              },
-              {
-                id: 'l4-c',
-                code: 'L4-C',
-                shortTitle: 'Etichettamento come Rachitismo/Osteomalacia Carenziale resistente senza test PHEX',
-                clinicalTag: 'Errore Diagnostico',
-                bodyText: 'Attribuisci il quadro a malassorbimento o deficit vitaminico D atipico, escludendo l’indagine genetica PHEX e il dosaggio di FGF23.',
-                outcomeType: 'error',
-                qualityDeltaPct: -16,
-                valuePoints: 0,
-                advanceOnSelect: true,
-                nextBranchKey: 'default',
-                feedbackTitle: 'Errore diagnostico — Misclassificazione (-16% CQ)',
-                feedbackRationale: 'Confondere una forma genetica FGF23-mediata con un deficit nutrizionale impedisce l’accesso a terapie specifiche e alla consulenza genetica.',
-                patientImpact: 'Inquadramento errato e percorso terapeutico inadeguato.'
-              },
-              {
-                id: 'l4-d',
-                code: 'L4-D',
-                shortTitle: 'Consulenza genetica basata su modello autosomico recessivo',
-                clinicalTag: 'Errore Genetica X‑Linked',
-                bodyText: 'Comunichi alla famiglia che la malattia si trasmette in modo autosomico recessivo e che un padre affetto trasmette lo stesso rischio ai figli maschi e alle femmine.',
-                outcomeType: 'error',
-                qualityDeltaPct: -14,
-                valuePoints: 0,
-                advanceOnSelect: true,
-                nextBranchKey: 'default',
-                feedbackTitle: 'Errore di trasmissione genetica (-14% CQ)',
-                feedbackRationale: 'L’XLH è X‑Linked dominante: il padre affetto trasmette la mutazione al 100% delle figlie femmine e allo 0% dei figli maschi; la madre affetta ha il 50% di probabilità di trasmissione a ciascun figlio/a indipendentemente dal sesso.',
-                patientImpact: 'Informazione genetica fuorviante per la pianificazione familiare e lo screening.'
-              },
-              {
-                id: 'l4-e',
-                code: 'L4-E',
-                shortTitle: 'Biopsia ossea invasiva di routine prima della valutazione biochimica e genetica',
-                clinicalTag: 'Esame Inappropriato',
-                bodyText: 'Richiedi immediatamente una biopsia ossea diagnostica come primo accertamento al posto del percorso biochimico-genetico non invasivo.',
-                outcomeType: 'error',
-                qualityDeltaPct: -12,
-                valuePoints: 0,
-                advanceOnSelect: true,
-                nextBranchKey: 'default',
-                feedbackTitle: 'Invasività non necessaria (-12% CQ)',
-                feedbackRationale: 'La diagnosi di XLH si fonda su clinica, biochimica fosfo‑calcica (ipofosfatemia con perdita renale di fosfato, FGF23) e test genetico PHEX, non su biopsia ossea routinaria.',
-                patientImpact: 'Procedura invasiva evitabile con stress e ritardo diagnostico.'
-              }
-            ]
-          }
-        }
-      },
-
-      /* ══════════════════ LIVELLO 5 — TERAPEUTICA (6 POST-IT) ══════════════════ */
-      {
-        level: 5,
-        domainKey: 'terapeutica',
-        domainLabel: 'Scelta Terapeutica',
-        nodesByBranch: {
-          default: {
-            complexityRank: 5,
-            stageMaxValue: 300,
-            preChoiceEvolution: {
-              headline: 'T5 · Strategia Terapeutica Multidisciplinare post-Diagnosi XLH',
-              narrative: 'La diagnosi di Ipofosfatemia X‑Linked è confermata (mutazione loss-of-function PHEX con iperproduzione di FGF23). Il team multidisciplinare del Centro Prescrittore deve impostare il programma terapeutico e di supporto personalizzato per età e quadro clinico.',
-              clinicalUpdates: [
-                { label: 'Diagnosi Confermata', value: 'XLH · Mutazione PHEX / Eccesso FGF23' },
-                { label: 'Dimensioni da Coprire', value: 'Omeostasi fosfato · Scheletro · Denti · Funzionalità motoria' }
-              ],
-              decisionPrompt: 'Quale impostazione terapeutica integrata (non prescrittiva in simulazione) è coerente con il percorso RADAR XLH?'
-            },
-            tiles: [
-              {
-                id: 'l5-a',
-                code: 'L5-A',
-                shortTitle: 'Approccio mirato alla via FGF23 / valutazione specialistica + presa in carico multidisciplinare',
-                clinicalTag: 'Care Pathway Ottimale',
-                bodyText: 'Nel Centro Prescrittore si valuta l’opzione terapeutica mirata al meccanismo fisiopatologico (blocco dell’eccesso di FGF23) rispetto o in confronto alla terapia convenzionale (sali di fosfato + calcitriolo), integrando presa in carico odontoiatrica, ortopedica e fisiatrica.',
-                outcomeType: 'optimal',
-                qualityDeltaPct: 0,
-                valuePoints: 300,
-                advanceOnSelect: true,
-                nextBranchKey: 'default',
-                feedbackTitle: 'Terapia mirata al meccanismo e presa in carico integrata',
-                feedbackRationale: 'Come illustrato nel Modulo 6 di RADAR XLH, l’evoluzione delle terapie mirate alla via FGF23 agisce a monte della perdita renale di fosfato e dell’inibizione della 1α-idrossilasi, affiancandosi a un percorso multidisciplinare strutturato.',
-                patientImpact: 'Controllo fisiopatologico della perdita di fosfato e protezione coordinata di ossa, denti e mobilità.'
-              },
-              {
-                id: 'l5-b',
-                code: 'L5-B',
-                shortTitle: 'Terapia convenzionale (fosfato orale + calcitriolo) con stretto monitoraggio sicurezza',
-                clinicalTag: 'Opzione Convenzionale Monitorata',
-                bodyText: 'Imposti terapia convenzionale con supplementi frazionati di fosfato e analoghi attivi della vitamina D (calcitriolo/alfacalcidolo), programmando stretto monitoraggio di calciuria, nefrocalcinosi e iperparatiroidismo secondario.',
-                outcomeType: 'acceptable',
+                id: 'S3-COM-B',
+                headline: 'Fornire indicazioni generiche senza spiegare il perché del percorso',
+                bodyText: 'Lasciare il paziente senza chiavi di lettura.',
+                isCorrect: false,
                 qualityDeltaPct: -5,
-                valuePoints: 200,
-                advanceOnSelect: true,
-                nextBranchKey: 'default',
-                feedbackTitle: 'Approccio convenzionale vigile (-5% CQ)',
-                feedbackRationale: 'La terapia convenzionale resta un riferimento storico con efficacia variabile e rischio di effetti avversi (nefrocalcinosi, iperparatiroidismo, scarsa tollerabilità GI), che richiede quindi attenta valutazione comparativa con le terapie mirate anti-FGF23.',
-                patientImpact: 'Richiede frequenti somministrazioni giornaliere e sorveglianza ecografica/biochimica serrata.'
-              },
-              {
-                id: 'l5-c',
-                code: 'L5-C',
-                shortTitle: 'Terapia specifica senza coinvolgimento di odontoiatra, ortopedico e fisiatra',
-                clinicalTag: 'Approccio Monodisciplinare',
-                bodyText: 'Avvii il trattamento farmacologico corretto ma trascuri la valutazione odontoiatrica preventiva e il supporto riabilitativo/ortopedico.',
-                outcomeType: 'acceptable',
-                qualityDeltaPct: -8,
-                valuePoints: 150,
-                advanceOnSelect: true,
-                nextBranchKey: 'default',
-                feedbackTitle: 'Farmaco ok, ma rete multidisciplinare incompleta (-8% CQ)',
-                feedbackRationale: 'Nell’XLH le manifestazioni odontoiatriche (ascessi spontanei, alterazioni dentinali) e muscolo-scheletriche richiedono collaborazione continuativa tra specialisti.',
-                patientImpact: 'Complicanze dentarie o limitazioni funzionali residue non intercettate precocemente.'
-              },
-              {
-                id: 'l5-d',
-                code: 'L5-D',
-                shortTitle: 'Soli sali di fosfato ad alte dosi senza calcitriolo né valutazione anti-FGF23',
-                clinicalTag: 'Squilibrio Metabolico',
-                bodyText: 'Somministri solo fosfato orale ad alto dosaggio senza vitamina D attiva e senza considerare il ruolo di FGF23.',
-                outcomeType: 'error',
-                qualityDeltaPct: -15,
                 valuePoints: 0,
-                advanceOnSelect: true,
-                nextBranchKey: 'default',
-                feedbackTitle: 'Errore terapeutico — Rischio iperparatiroidismo (-15% CQ)',
-                feedbackRationale: 'Il fosfato orale da solo stimola il PTH favorendo iperparatiroidismo secondario/terziario e peggiorando ulteriormente la perdita renale di fosfato.',
-                patientImpact: 'Squilibrio calcio-PTH e scarso controllo della mineralizzazione.'
+                feedbackText: 'Errato (-5% CQ). La scarsa consapevolezza del legame tra patologia e gestione nell’adulto favorisce l’abbandono dei controlli.'
               },
               {
-                id: 'l5-e',
-                code: 'L5-E',
-                shortTitle: 'Sola supplementazione di Calcio e Colecalciferolo (vitamina D nativa)',
-                clinicalTag: 'Terapia Inefficace',
-                bodyText: 'Tratti la condizione come un comune deficit calcico/vitaminico D con calcio carbonato e colecalciferolo.',
-                outcomeType: 'error',
-                qualityDeltaPct: -18,
+                id: 'S3-COM-C',
+                headline: 'Affermare che una diagnosi posta a 6 mesi non ha più implicazioni nell’adulto',
+                bodyText: 'Negare la cronicità dell’XLH.',
+                isCorrect: false,
+                qualityDeltaPct: -10,
                 valuePoints: 0,
-                advanceOnSelect: true,
-                nextBranchKey: 'default',
-                feedbackTitle: 'Errore terapeutico — Target sbagliato (-18% CQ)',
-                feedbackRationale: 'Il blocco della 1α-idrossilasi indotto da FGF23 impedisce l’attivazione fisiologica della 25(OH)D e non corregge la fosfaturia; inoltre il carico di calcio espone a ipercalciuria senza beneficiare il fosfato.',
-                patientImpact: 'Nessun miglioramento osseo e potenziale danno renale da calcio.'
-              },
-              {
-                id: 'l5-f',
-                code: 'L5-F',
-                shortTitle: 'Bifosfonati o corticosteroidi sistemici per il dolore osseo',
-                clinicalTag: 'Controindicazione Clinica',
-                bodyText: 'Prescrivi bifosfonati o cicli steroidei per ridurre il dolore muscolo-scheletrico diffuso.',
-                outcomeType: 'error',
-                qualityDeltaPct: -20,
-                valuePoints: 0,
-                advanceOnSelect: true,
-                nextBranchKey: 'default',
-                feedbackTitle: 'Errore grave — Farmaci controindicati nell’osteomalacia (-20% CQ)',
-                feedbackRationale: 'I bifosfonati inibiscono il rimodellamento senza correggere il difetto di mineralizzazione ipofosfatemico e possono peggiorare l’osteomalacia; gli steroidi aggravano la fragilità scheletrica.',
-                patientImpact: 'Peggioramento del quadro scheletrico e del rischio di pseudofratture.'
+                feedbackText: 'Errato (-10% CQ). L’XLH è una condizione cronica e progressiva per tutta la vita.'
               }
             ]
           }
-        }
+        ]
       },
 
-      /* ══════════════════ LIVELLO 6 — MANTENIMENTO / FOLLOW-UP (7 POST-IT) ══════════════════ */
+      /* ══════════════════ STEP 4 — 4 SNODI (4 x 4 = 16 POST-IT) ══════════════════ */
       {
-        level: 6,
-        domainKey: 'followup',
-        domainLabel: 'Scelta Mantenimento / Follow-up',
-        nodesByBranch: {
+        stepNumber: 4,
+        title: 'Quarto Avanzamento',
+        preChoiceEvolutionByBranch: {
           default: {
-            complexityRank: 6,
-            stageMaxValue: 350,
-            preChoiceEvolution: {
-              headline: 'T6 · Lungo Termine, Transizione Pediatrico-Adulto e Qualità di Vita',
-              narrative: 'Il percorso entra nella fase longitudinale: bisogna garantire continuità terapeutica e assistenziale lungo tutto l’arco di vita, governando la delicata transizione dall’età pediatrica all’età adulta ed evitando la perdita al follow-up che genera dolore cronico, entesopatie, pseudofratture e compromissione della qualità di vita.',
-              clinicalUpdates: [
-                { label: 'Orizzonte Temporale', value: 'Follow-up life-long · Transizione Pediatrico → Adulto' },
-                { label: 'Outcome Principali', value: 'Dolore, entesopatie, pseudofratture, salute dentaria, QoL' }
-              ],
-              decisionPrompt: 'Quale piano di mantenimento e follow-up strutturato adotti?'
-            },
+            headline: 'Aggiornamento Narrativo Evolutivo (Prima della Scelta)',
+            narrative: 'Matteo (26 anni) ha un quadro ben delineato sul piano anamnestico e clinico, ma riferisce ancora dolore, rigidità, ridotta mobilità e timori legati alla gestione quotidiana della malattia nell’età adulta, avendo sperimentato in passato un percorso complesso (scoliosi, ascessi dentali ricorrenti, frattura del coccige, intervento per Chiari tipo I) e l’interruzione dei controlli dopo l’infanzia.'
+          }
+        },
+        snodi: [
+          {
+            snodoId: 's4-1',
+            snodoCode: '4.1',
+            domainKey: 'gestionale',
+            domainLabel: 'Scelta Gestionale',
+            valueWeight: 100,
             tiles: [
               {
-                id: 'l6-a',
-                code: 'L6-A',
-                shortTitle: 'Follow-up life-long strutturato, transizione guidata Pediatrico-Adulto e rete territoriale',
-                clinicalTag: 'Standard RADAR XLH Ottimale',
-                bodyText: 'Pianifichi un passaggio strutturato dal team pediatrico al team dell’adulto (senza interrompere le cure al termine della crescita), con monitoraggio periodico biochimico, renale, odontoiatrico, ortopedico/fisiatrico, valutazione della qualità di vita (PRO) e raccordo costante con MMG/territorio.',
-                outcomeType: 'optimal',
+                id: 'S4-GES-A',
+                headline: 'Coordinare il team multidisciplinare sulle esigenze individuali di Matteo',
+                bodyText: 'Attivare sotto regia dello specialista in malattie metaboliche dell’osso le aree rilevanti (es. odontoiatria per la storia di ascessi ricorrenti, fisioterapia/terapia del dolore per rigidità e mobilità, supporto psicologico/salute mentale e consulenze mirate).',
+                isCorrect: true,
                 qualityDeltaPct: 0,
-                valuePoints: 350,
-                advanceOnSelect: true,
-                nextBranchKey: 'default',
-                feedbackTitle: 'Continuità di cura lungo tutto il ciclo di vita',
-                feedbackRationale: 'I Moduli 6 e 7 di RADAR XLH sottolineano che l’XLH non termina con la chiusura delle cartilagini di accrescimento: la transizione guidata e il monitoraggio multidisciplinare prevengono entesopatie, pseudofratture e perdita al follow-up.',
-                patientImpact: 'Massima tutela della funzionalità motoria, della salute orale e della qualità di vita a lungo termine.'
+                valuePoints: 100,
+                feedbackText: 'Corretto. L’assistenza multidisciplinare coordinata dallo specialista in malattie metaboliche dell’osso include ulteriori aree in base alle esigenze individuali dell’adulto.'
               },
               {
-                id: 'l6-b',
-                code: 'L6-B',
-                shortTitle: 'Follow-up continuo solo presso il Centro Specialistico senza raccordo con MMG e dentista',
-                clinicalTag: 'Follow-up Parziale',
-                bodyText: 'Mantieni i controlli annuali al Centro di riferimento ma non coinvolgi il medico di medicina generale territoriale né programmi controlli odontoiatrici cadenzati.',
-                outcomeType: 'acceptable',
-                qualityDeltaPct: -4,
-                valuePoints: 230,
-                advanceOnSelect: true,
-                nextBranchKey: 'default',
-                feedbackTitle: 'Monitoraggio buono ma rete territoriale incompleta (-4% CQ)',
-                feedbackRationale: 'Coinvolgere le figure territoriali riduce la distanza tra controlli specialistici e intercetta precocemente ascessi dentari o riacutizzazioni algiche.',
-                patientImpact: 'Controllo discreto ma minore tempestività tra una visita di centro e l’altra.'
-              },
-              {
-                id: 'l6-c',
-                code: 'L6-C',
-                shortTitle: 'Monitoraggio dei soli esami del sangue senza valutazione dolore, mobilità e PRO',
-                clinicalTag: 'Focus Solo Biochimico',
-                bodyText: 'Valuti esclusivamente fosfatemia e ALP nei controlli periodici, trascurando questionari su qualità di vita, stanchezza, rigidità articolare e ricerca di entesopatie.',
-                outcomeType: 'acceptable',
-                qualityDeltaPct: -7,
-                valuePoints: 170,
-                advanceOnSelect: true,
-                nextBranchKey: 'default',
-                feedbackTitle: 'Trascurati gli outcome centrati sul paziente (-7% CQ)',
-                feedbackRationale: 'Nell’adulto con XLH dolore, rigidità, entesopatie e qualità di vita possono impattare fortemente anche a fronte di parametri ematochimici stabilizzati.',
-                patientImpact: 'Disagio funzionale sottostimato durante il follow-up.'
-              },
-              {
-                id: 'l6-d',
-                code: 'L6-D',
-                shortTitle: 'Sospensione del follow-up e della terapia al termine dell’accrescimento staturale',
-                clinicalTag: 'Errore Classico di Transizione',
-                bodyText: 'Concludi il percorso clinico al raggiungimento dell’età adulta ritenendo che, esaurito il rachitismo pediatrico, la malattia sia ormai stabilizzata.',
-                outcomeType: 'error',
-                qualityDeltaPct: -20,
+                id: 'S4-GES-B',
+                headline: 'Trascurare l’area odontoiatrica nonostante l’anamnesi di ascessi dentali ricorrenti',
+                bodyText: 'Non attivare il dentista.',
+                isCorrect: false,
+                qualityDeltaPct: -10,
                 valuePoints: 0,
-                advanceOnSelect: true,
-                nextBranchKey: 'default',
-                feedbackTitle: 'Errore critico — Interruzione alla fine della crescita (-20% CQ)',
-                feedbackRationale: 'È una delle criticità maggiori evidenziate dal Modulo 6 e 7: interrompere il follow-up dopo la crescita espone l’adulto a osteomalacia sintomatica, pseudofratture, entesopatie calcifiche, perdita dentaria e perdita al follow-up.',
-                patientImpact: 'Comparsa di complicanze croniche invalidanti in età adulta.'
+                feedbackText: 'Errato (-10% CQ). Le complicanze dentali/ascessi sono tipiche dell’XLH e l’odontoiatria è parte del percorso multidisciplinare.'
               },
               {
-                id: 'l6-e',
-                code: 'L6-E',
-                shortTitle: 'Controlli esclusivamente al bisogno in caso di frattura o dolore acuto',
-                clinicalTag: 'Gestione Reattiva',
-                bodyText: 'Affidi al paziente la decisione di prenotare controlli solo se dovessero comparire dolori acuti o eventi traumatici.',
-                outcomeType: 'error',
+                id: 'S4-GES-C',
+                headline: 'Escludere fisioterapia e supporto psicologico/salute mentale',
+                bodyText: 'Ignorare mobilità e vissuto del paziente.',
+                isCorrect: false,
+                qualityDeltaPct: -10,
+                valuePoints: 0,
+                feedbackText: 'Errato (-10% CQ). Le fonti includono fisioterapia e supporto per la salute mentale/psicologia tra le aree potenzialmente coinvolte nella cura dell’adulto.'
+              },
+              {
+                id: 'S4-GES-D',
+                headline: 'Non fissare un referente o un piano continuativo',
+                bodyText: 'Lasciare la gestione al caso.',
+                isCorrect: false,
                 qualityDeltaPct: -15,
                 valuePoints: 0,
-                advanceOnSelect: true,
-                nextBranchKey: 'default',
-                feedbackTitle: 'Errore di follow-up — Approccio solo reattivo (-15% CQ)',
-                feedbackRationale: 'Le pseudofratture e la nefrocalcinosi decorrono spesso in modo subdolo: solo un monitoraggio proattivo programmato previene complicanze irreversibili.',
-                patientImpact: 'Intervento tardivo a danno scheletrico o renale già instaurato.'
+                feedbackText: 'Errato (-15% CQ). La continuità assistenziale è fondamentale per evitare ricadute e interruzioni del percorso.'
+              }
+            ]
+          },
+          {
+            snodoId: 's4-2',
+            snodoCode: '4.2',
+            domainKey: 'diagnostica',
+            domainLabel: 'Scelta Diagnostica',
+            valueWeight: 100,
+            tiles: [
+              {
+                id: 'S4-DIA-A',
+                headline: 'Eseguire rivalutazione clinica, biochimica, dentale e imaging mirato alle manifestazioni presenti',
+                bodyText: 'Verificare parametri biochimici, stato dentale e studi strumentali mirati in base alla clinica e all’anamnesi (inclusa storia di scoliosi, frattura coccigea e Chiari tipo I).',
+                isCorrect: true,
+                qualityDeltaPct: 0,
+                valuePoints: 100,
+                feedbackText: 'Corretto. Il monitoraggio e l’inquadramento devono essere personalizzati sulle caratteristiche cliniche, biochimiche, radiologiche e anamnestiche del paziente.'
               },
               {
-                id: 'l6-f',
-                code: 'L6-F',
-                shortTitle: 'Sospensione dei controlli renali e dell’ecografia in terapia cronica',
-                clinicalTag: 'Omissione Sicurezza',
-                bodyText: 'Mantieni la prescrizione ma elimini ecografia renale, calciuria e PTH dal piano di sorveglianza periodica.',
-                outcomeType: 'error',
-                qualityDeltaPct: -12,
+                id: 'S4-DIA-B',
+                headline: 'Omettere qualsiasi controllo biochimico, dentale o strumentale',
+                bodyText: 'Non verificare lo stato attuale.',
+                isCorrect: false,
+                qualityDeltaPct: -10,
                 valuePoints: 0,
-                advanceOnSelect: true,
-                nextBranchKey: 'default',
-                feedbackTitle: 'Errore di sicurezza nel mantenimento (-12% CQ)',
-                feedbackRationale: 'La sorveglianza della funzionalità renale, della calciuria e del PTH è indispensabile nel follow-up dell’XLH per prevenire o individuare precocemente nefrocalcinosi e iperparatiroidismo.',
-                patientImpact: 'Rischio di tossicità renale non rilevata.'
+                feedbackText: 'Errato (-10% CQ). Il monitoraggio clinico, biochimico, funzionale e dentale è essenziale per seguire l’evoluzione della malattia.'
               },
               {
-                id: 'l6-g',
-                code: 'L6-G',
-                shortTitle: 'Interruzione dell’attività fisica adattata per timore generico di fragilità',
-                clinicalTag: 'Restrizione Controproducente',
-                bodyText: 'Sconsigli qualsiasi attività motoria e fisioterapica prescrivendo riposo prolungato permanente.',
-                outcomeType: 'error',
-                qualityDeltaPct: -16,
+                id: 'S4-DIA-C',
+                headline: 'Presumere che l’anamnesi pregressa escluda nuove manifestazioni o complicanze',
+                bodyText: 'Non controllare i sintomi attuali.',
+                isCorrect: false,
+                qualityDeltaPct: -10,
                 valuePoints: 0,
-                advanceOnSelect: true,
-                nextBranchKey: 'default',
-                feedbackTitle: 'Errore riabilitativo — Decondizionamento (-16% CQ)',
-                feedbackRationale: 'La presa in carico fisiatrica mirata e l’esercizio fisico sicuro e adattato migliorano forza muscolare, mobilità articolare e qualità di vita nell’XLH.',
-                patientImpact: 'Peggioramento di astenia, rigidità e qualità di vita percepita.'
+                feedbackText: 'Errato (-10% CQ). Nell’adulto con XLH possono persistere o comparire manifestazioni e complicanze che richiedono valutazione mirata.'
+              },
+              {
+                id: 'S4-DIA-D',
+                headline: 'Applicare un protocollo identico per tutti senza adattarlo al profilo individuale',
+                bodyText: 'Ignorare la variabilità clinica.',
+                isCorrect: false,
+                qualityDeltaPct: -5,
+                valuePoints: 0,
+                feedbackText: 'Errato (-5% CQ). Le manifestazioni cliniche, radiologiche e biochimiche variano tra individui e richiedono personalizzazione.'
+              }
+            ]
+          },
+          {
+            snodoId: 's4-3',
+            snodoCode: '4.3',
+            domainKey: 'terapeutica',
+            domainLabel: 'Scelta Terapeutica',
+            valueWeight: 100,
+            tiles: [
+              {
+                id: 'S4-TER-A',
+                headline: 'Personalizzare il trattamento sull’adulto in base a bisogni individuali, storia clinica e valutazione specialistica',
+                bodyText: 'Definire la strategia terapeutica insieme al paziente, tenendo conto del profilo clinico, della storia di pregressa interruzione e della disponibilità/modalità di somministrazione e monitoraggio.',
+                isCorrect: true,
+                qualityDeltaPct: 0,
+                valuePoints: 100,
+                feedbackText: 'Corretto. Trattamento e monitoraggio vanno personalizzati in base alle manifestazioni cliniche, alla storia clinica, al giudizio specialistico e ai bisogni individuali.'
+              },
+              {
+                id: 'S4-TER-B',
+                headline: 'Ritenere che nell’adulto non serva alcuna terapia perché la crescita è finita',
+                bodyText: 'Escludere a priori il trattamento dell’adulto.',
+                isCorrect: false,
+                qualityDeltaPct: -15,
+                valuePoints: 0,
+                feedbackText: 'Errato (-15% CQ). L’XLH è una malattia progressiva che dura tutta la vita; la scarsa consapevolezza del trattamento nell’adulto è una delle cause di mancata o interrotta cura.'
+              },
+              {
+                id: 'S4-TER-C',
+                headline: 'Impostare una terapia senza prevedere monitoraggio di efficacia, sicurezza e potenziali eventi avversi',
+                bodyText: 'Trascurare la sorveglianza.',
+                isCorrect: false,
+                qualityDeltaPct: -10,
+                valuePoints: 0,
+                feedbackText: 'Errato (-10% CQ). Nel paziente adulto progressione di malattia, sintomi irrisolti e potenziali eventi avversi richiedono un monitoraggio regolare.'
+              },
+              {
+                id: 'S4-TER-D',
+                headline: 'Ignorare i bisogni e le difficoltà pratiche del paziente nella gestione quotidiana della terapia',
+                bodyText: 'Non considerare l’impatto pratico.',
+                isCorrect: false,
+                qualityDeltaPct: -10,
+                valuePoints: 0,
+                feedbackText: 'Errato (-10% CQ). Considerare i bisogni individuali e le modalità di gestione/somministrazione aiuta a ridurre gli ostacoli nella vita quotidiana.'
+              }
+            ]
+          },
+          {
+            snodoId: 's4-4',
+            snodoCode: '4.4',
+            domainKey: 'comunicazionale',
+            domainLabel: 'Scelta Comunicazionale',
+            valueWeight: 100,
+            tiles: [
+              {
+                id: 'S4-COM-A',
+                headline: 'Costruire un’alleanza terapeutica basata su chiarezza e obiettivi realistici',
+                bodyText: 'Illustrare come la gestione mirata e la continuità delle cure aiutino ad affrontare dolore, rigidità, mobilità e prevenzione delle complicanze.',
+                isCorrect: true,
+                qualityDeltaPct: 0,
+                valuePoints: 100,
+                feedbackText: 'Corretto. Una comunicazione chiara e condivisa favorisce la comprensione del percorso e la continuità assistenziale.'
+              },
+              {
+                id: 'S4-COM-B',
+                headline: 'Promettere la cancellazione immediata di tutti gli esiti strutturali pregressi',
+                bodyText: 'Creare aspettative irrealistiche.',
+                isCorrect: false,
+                qualityDeltaPct: -10,
+                valuePoints: 0,
+                feedbackText: 'Errato (-10% CQ). Alcune manifestazioni o conseguenze strutturali richiedono un inquadramento realistico della progressione e del controllo sintomatologico.'
+              },
+              {
+                id: 'S4-COM-C',
+                headline: 'Giudicare o colpevolizzare Matteo per aver interrotto i controlli dopo l’infanzia',
+                bodyText: 'Adottare un approccio punitivo.',
+                isCorrect: false,
+                qualityDeltaPct: -10,
+                valuePoints: 0,
+                feedbackText: 'Errato (-10% CQ). L’interruzione dei controlli nell’adulto è spesso legata alla scarsa consapevolezza della necessità di cura continua nell’età adulta.'
+              },
+              {
+                id: 'S4-COM-D',
+                headline: 'Imporre decisioni senza coinvolgere il paziente',
+                bodyText: 'Non spiegare le motivazioni delle scelte.',
+                isCorrect: false,
+                qualityDeltaPct: -5,
+                valuePoints: 0,
+                feedbackText: 'Errato (-5% CQ). Coinvolgere il paziente migliora la consapevolezza e l’aderenza al percorso.'
               }
             ]
           }
-        }
+        ]
+      },
+
+      /* ══════════════════ STEP 5 — 5 SNODI (5 x 4 = 20 POST-IT) ══════════════════ */
+      {
+        stepNumber: 5,
+        title: 'Quinto Avanzamento',
+        preChoiceEvolutionByBranch: {
+          default: {
+            headline: 'Aggiornamento Narrativo Evolutivo (Prima della Scelta)',
+            narrative: 'Matteo (26 anni) ha completato l’inquadramento iniziale e ha avviato un percorso strutturato. Ora il focus si sposta sul mantenimento nel tempo: come monitorare regolarmente sintomi, funzionalità, stato dentale ed eventuali esami strumentali, come mantenere viva la rete multidisciplinare e come gestire gli aspetti familiari e riproduttivi legati alla trasmissione X‑Linked della sua storia.'
+          }
+        },
+        snodi: [
+          {
+            snodoId: 's5-1',
+            snodoCode: '5.1',
+            domainKey: 'followup',
+            domainLabel: 'Scelta Mantenimento / Follow-up',
+            valueWeight: 100,
+            tiles: [
+              {
+                id: 'S5-FOL-A',
+                headline: 'Definire un piano di follow-up e monitoraggio regolare e strutturato',
+                bodyText: 'Programmare controlli clinici periodici, valutazione funzionale (test del cammino dei 6 minuti) e qualità di vita (BPI e WOMAC), monitoraggio dentale (rischio parodontale e ortopantomografia) e imaging mirato secondo indicazione.',
+                isCorrect: true,
+                qualityDeltaPct: 0,
+                valuePoints: 100,
+                feedbackText: 'Corretto. Nell’adulto la progressione della patologia, le complicanze correlate a sintomi irrisolti e i potenziali eventi avversi richiedono follow-up e monitoraggio regolari e frequenti.'
+              },
+              {
+                id: 'S5-FOL-B',
+                headline: 'Non programmare alcun calendario di follow-up, rimandando solo a eventuali emergenze',
+                bodyText: 'Abbandonare il monitoraggio periodico.',
+                isCorrect: false,
+                qualityDeltaPct: -15,
+                valuePoints: 0,
+                feedbackText: 'Errato (-15% CQ). Il piano di follow-up per l’adulto con XLH prevede controlli e monitoraggio periodici e strutturati.'
+              },
+              {
+                id: 'S5-FOL-C',
+                headline: 'Omettere il monitoraggio dentale e funzionale/qualità di vita',
+                bodyText: 'Trascurare aspetti chiave del follow-up adulto.',
+                isCorrect: false,
+                qualityDeltaPct: -10,
+                valuePoints: 0,
+                feedbackText: 'Errato (-10% CQ). Il follow-up dell’adulto include valutazione dentale (rischio parodontale, ortopantomografia), test del cammino dei 6 minuti e scale BPI/WOMAC.'
+              },
+              {
+                id: 'S5-FOL-D',
+                headline: 'Ripetere indistintamente esami di imaging avanzato senza indicazioni cliniche',
+                bodyText: 'Non seguire i criteri del piano.',
+                isCorrect: false,
+                qualityDeltaPct: -10,
+                valuePoints: 0,
+                feedbackText: 'Errato (-10% CQ). Gli esami di imaging (come RMI del cranio, ecocardiogramma, ecografia renale) hanno indicazioni mirate nel piano di follow-up.'
+              }
+            ]
+          },
+          {
+            snodoId: 's5-2',
+            snodoCode: '5.2',
+            domainKey: 'gestionale',
+            domainLabel: 'Scelta Gestionale',
+            valueWeight: 100,
+            tiles: [
+              {
+                id: 'S5-GES-A',
+                headline: 'Mantenere la regia dello specialista in malattie metaboliche dell’osso con revisioni multidisciplinari periodiche',
+                bodyText: 'Garantire il raccordo continuo tra centro di riferimento e specialisti coinvolti in base all’evoluzione individuale.',
+                isCorrect: true,
+                qualityDeltaPct: 0,
+                valuePoints: 100,
+                feedbackText: 'Corretto. I pazienti con XLH devono essere rivisti regolarmente da un team multidisciplinare coordinato da un esperto in malattie metaboliche dell’osso.'
+              },
+              {
+                id: 'S5-GES-B',
+                headline: 'Scollegare il paziente dal centro di riferimento dopo il primo inquadramento',
+                bodyText: 'Interrompere il coordinamento.',
+                isCorrect: false,
+                qualityDeltaPct: -10,
+                valuePoints: 0,
+                feedbackText: 'Errato (-10% CQ). La continuità coordinata previene frammentazione assistenziale e perdita al follow-up.'
+              },
+              {
+                id: 'S5-GES-C',
+                headline: 'Considerare concluso il percorso di cura',
+                bodyText: 'Ritenere non più necessaria la gestione specialistica.',
+                isCorrect: false,
+                qualityDeltaPct: -15,
+                valuePoints: 0,
+                feedbackText: 'Errato (-15% CQ). L’XLH è una condizione che dura tutta la vita e richiede assistenza continuativa.'
+              },
+              {
+                id: 'S5-GES-D',
+                headline: 'Non aggiornare il team al variare dei bisogni di Matteo',
+                bodyText: 'Mantenere una gestione statica.',
+                isCorrect: false,
+                qualityDeltaPct: -5,
+                valuePoints: 0,
+                feedbackText: 'Errato (-5% CQ). Le aree coinvolte nella cura dell’adulto si adattano alle esigenze individuali nel tempo.'
+              }
+            ]
+          },
+          {
+            snodoId: 's5-3',
+            snodoCode: '5.3',
+            domainKey: 'investigativa',
+            domainLabel: 'Scelta Investigativa / Esaminazione',
+            valueWeight: 100,
+            tiles: [
+              {
+                id: 'S5-INV-A',
+                headline: 'Raccogliere periodicamente la storia clinica di tutti i domini rilevanti',
+                bodyText: 'Indagare a ogni controllo cefalea, manifestazioni orali, fatigue, pseudofratture, dolore muscoloscheletrico, udito, neurologia e funzionalità motoria.',
+                isCorrect: true,
+                qualityDeltaPct: 0,
+                valuePoints: 100,
+                feedbackText: 'Corretto. L’esame clinico nel follow-up dell’adulto include la raccolta periodica della storia clinica di questi sintomi e la valutazione funzionale/uditiva/neurologica.'
+              },
+              {
+                id: 'S5-INV-B',
+                headline: 'Chiedere solo se il dolore è presente al momento della visita',
+                bodyText: 'Non esplorare fatigue, sintomi orali, uditivi o neurologici.',
+                isCorrect: false,
+                qualityDeltaPct: -10,
+                valuePoints: 0,
+                feedbackText: 'Errato (-10% CQ). Il monitoraggio clinico richiede un’indagine sistematica su più sintomi e domini funzionali.'
+              },
+              {
+                id: 'S5-INV-C',
+                headline: 'Ignorare i cambiamenti nella funzionalità quotidiana e nella mobilità',
+                bodyText: 'Non valutare l’impatto pratico.',
+                isCorrect: false,
+                qualityDeltaPct: -10,
+                valuePoints: 0,
+                feedbackText: 'Errato (-10% CQ). Dolore, rigidità e limitazioni funzionali influenzano la qualità di vita e vanno monitorati nel tempo.'
+              },
+              {
+                id: 'S5-INV-D',
+                headline: 'Non annotare i sintomi riferiti dal paziente tra una visita e l’altra',
+                bodyText: 'Sottovalutare l’anamnesi di aggiornamento.',
+                isCorrect: false,
+                qualityDeltaPct: -5,
+                valuePoints: 0,
+                feedbackText: 'Errato (-5% CQ). La raccolta della storia clinica dei sintomi è parte centrale del piano di follow-up.'
+              }
+            ]
+          },
+          {
+            snodoId: 's5-4',
+            snodoCode: '5.4',
+            domainKey: 'diagnostica',
+            domainLabel: 'Scelta Diagnostica',
+            valueWeight: 100,
+            tiles: [
+              {
+                id: 'S5-DIA-A',
+                headline: 'Eseguire esami di monitoraggio e imaging mirato secondo le indicazioni cliniche',
+                bodyText: 'Valutare parametri biochimici/esami speciali e attivare l’imaging appropriato (es. RMI del cranio se indicato da segni/sintomi neurologici o cefalea ricorrente/declino cognitivo/craniosinostosi, ecocardiogramma se ipertensione, ecografia renale se nefrocalcitosi/ipercalciuria).',
+                isCorrect: true,
+                qualityDeltaPct: 0,
+                valuePoints: 100,
+                feedbackText: 'Corretto. Il piano di follow-up definisce esami speciali e imaging mirato in base alle condizioni cliniche del paziente.'
+              },
+              {
+                id: 'S5-DIA-B',
+                headline: 'Non eseguire alcun controllo biochimico o strumentale di monitoraggio',
+                bodyText: 'Rinunciare a verifiche oggettive.',
+                isCorrect: false,
+                qualityDeltaPct: -10,
+                valuePoints: 0,
+                feedbackText: 'Errato (-10% CQ). Il monitoraggio periodico permette di seguire l’andamento clinico e intercettare complicanze o eventi avversi.'
+              },
+              {
+                id: 'S5-DIA-C',
+                headline: 'Prescrivere ecografia renale o ecocardiogramma senza legarli alle rispettive indicazioni del piano',
+                bodyText: 'Eseguire esami non mirati.',
+                isCorrect: false,
+                qualityDeltaPct: -5,
+                valuePoints: 0,
+                feedbackText: 'Errato (-5% CQ). Nel piano di follow-up l’ecocardiogramma è indicato in caso di ipertensione e l’ecografia renale in caso di nefrocalcitosi/ipercalciuria.'
+              },
+              {
+                id: 'S5-DIA-D',
+                headline: 'Leggere un singolo esame isolato senza integrarlo con clinica e anamnesi',
+                bodyText: 'Trarre conclusioni parziali.',
+                isCorrect: false,
+                qualityDeltaPct: -5,
+                valuePoints: 0,
+                feedbackText: 'Errato (-5% CQ). La valutazione richiede sempre una lettura integrata di clinica, laboratorio, genetica ed eventuali indagini strumentali.'
+              }
+            ]
+          },
+          {
+            snodoId: 's5-5',
+            snodoCode: '5.5',
+            domainKey: 'comunicazionale',
+            domainLabel: 'Scelta Comunicazionale',
+            valueWeight: 100,
+            tiles: [
+              {
+                id: 'S5-COM-A',
+                headline: 'Attivare family mapping, consulenza genetica e family planning con corretta informazione sull’ereditarietà X‑Linked',
+                bodyText: 'Raccomandare lo screening dei familiari a rischio (chiarendo che per un paziente maschio figli maschi e padre non sono a rischio) e offrire consulenza genetica per chi pianifica una gravidanza.',
+                isCorrect: true,
+                qualityDeltaPct: 0,
+                valuePoints: 100,
+                feedbackText: 'Corretto. Lo screening familiare (family mapping) favorisce diagnosi precoce, avvio tempestivo della terapia e family planning accurato, con consulenza genetica per le famiglie che pianificano una gravidanza.'
+              },
+              {
+                id: 'S5-COM-B',
+                headline: 'Dire che anche i figli maschi o il padre di Matteo (maschio) sono a rischio di trasmissione X‑Linked',
+                bodyText: 'Fornire un dato genetico errato.',
+                isCorrect: false,
+                qualityDeltaPct: -10,
+                valuePoints: 0,
+                feedbackText: 'Errato (-10% CQ). Nell’ereditarietà legata all’X, i figli maschi e il padre di un soggetto maschio affetto da XLH non sono a rischio, mentre i familiari a rischio vanno sottoposti a screening.'
+              },
+              {
+                id: 'S5-COM-C',
+                headline: 'Non affrontare il tema della mappatura familiare né della consulenza genetica',
+                bodyText: 'Ignorare l’impatto familiare e riproduttivo.',
+                isCorrect: false,
+                qualityDeltaPct: -10,
+                valuePoints: 0,
+                feedbackText: 'Errato (-10% CQ). Le raccomandazioni sottolineano l’importanza del family mapping e dell’offerta di consulenza genetica, soprattutto per chi pianifica una gravidanza.'
+              },
+              {
+                id: 'S5-COM-D',
+                headline: 'Sostenere che identificare precocemente i familiari a rischio non porta benefici',
+                bodyText: 'Sottovalutare la diagnosi tempestiva.',
+                isCorrect: false,
+                qualityDeltaPct: -10,
+                valuePoints: 0,
+                feedbackText: 'Errato (-10% CQ). La storia familiare e lo screening consentono diagnosi precoci ed evitano ritardi diagnostici e terapeutici.'
+              }
+            ]
+          }
+        ]
       }
     ]
   };
 
-  CALIBRATION_CASE.levels[2].nodesByBranch.early_phosphate = CALIBRATION_CASE.levels[2].nodesByBranch.default;
-
-  const CASE_01_SLOT = {
+  const NEXT_CASE_SLOT = {
     meta: {
-      id: 'case-01-slot',
-      code: 'CASO-01',
-      title: 'Caso Clinico #01 — In Attesa di Caricamento Contenuti dalla Faculty',
-      subtitle: 'Slot predisposto per il primo caso clinico narrativo ufficiale RADAR XLH con snodi decisionali personalizzati',
-      isCalibration: false,
+      id: 'caso-successivo-slot',
+      code: 'CASO 2.03+',
+      title: 'Slot Caso Clinico Successivo — Pronto per Caricamento Faculty',
+      subtitle: 'Slot predisposto per aggiungere nuovi casi clinici multi-snodo a Piramide Inversa (o testare file .json locali)',
       status: 'pending_case',
+      isCalibration: false,
       authors: 'Faculty Scientifica RADAR XLH',
-      targetSpecialties: ['Tutte le professioni accreditate ECM RADAR XLH'],
       initialQualityPct: 100,
       passThresholdPct: 75,
       plannedStructure: [
-        'Vertice (T0): Profilo clinico reale del paziente indice e parametri basali',
-        'Snodo 1: Scelta Comunicazionale (Post-it crescenti + narrazione pre-scelta)',
-        'Snodo 2: Scelta Investigativa / Esaminazione (con diramazioni Sliding Doors)',
-        'Snodo 3: Scelta Gestionale',
-        'Snodo 4: Scelta Diagnostica',
-        'Snodo 5: Scelta Terapeutica',
-        'Snodo 6: Scelta Mantenimento / Follow-up & Debriefing CQ%'
+        'Apice (Step 0): Briefing narrativo d’ingresso + scheda anamnestica completa',
+        'Step 1 → Step 5: Progressione piramidale multi-snodo (1 → 2 → 3 → 4 → 5)',
+        'Post-it con scelte corrette (0% CQ) ed errate (-X% CQ) e feedback didattico',
+        'Debriefing Finale con Coefficiente di Qualità (CQ%) e confronto Gold Standard'
       ]
     }
   };
 
   const CASE_JSON_TEMPLATE = {
     meta: {
-      id: 'caso-01-esempio',
-      code: 'CASO-01',
-      title: 'Titolo del Caso Clinico',
-      subtitle: 'Sottotitolo descrittivo del caso',
-      isCalibration: false,
+      id: 'nuovo-caso-xlh',
+      code: 'CASO 2.03',
+      title: 'Titolo Nuovo Caso Clinico XLH',
+      subtitle: 'Sottotitolo descrittivo',
       status: 'active',
-      authors: 'Nome Docente / Faculty',
-      targetSpecialties: ['PLS', 'MMG', 'Ortopedici', 'Odontoiatri'],
+      authors: 'Faculty RADAR XLH',
       initialQualityPct: 100,
       passThresholdPct: 75
     },
     apex: {
-      code: 'VERTICE · T0',
+      code: 'STEP 0 · APICE DELLA PIRAMIDE',
       badge: 'Caso Clinico Interattivo',
-      title: 'Presentazione Iniziale del Paziente',
-      patientSummary: 'Sintesi clinica iniziale visibile al vertice della piramide.',
-      clinicalParameters: [
-        { label: 'Età / Sesso', value: 'Da definire', flag: 'info' },
-        { label: 'Segno Principale', value: 'Da definire', flag: 'alert' }
-      ],
-      narrativeIntro: 'Descrizione narrativa iniziale del paziente al tempo T0.',
-      startPrompt: 'Seleziona la prima scelta al Livello 1.'
+      title: 'Inquadramento Iniziale del Paziente',
+      briefingQuotes: ['Citazione narrativa iniziale.'],
+      clinicalParameters: [{ label: 'Paziente', value: 'Età / Sesso', flag: 'info' }],
+      sections: [{ heading: 'Anamnesi', items: ['Dettaglio clinico'] }]
     },
-    levels: [
-      { level: 1, domainKey: 'comunicazionale', domainLabel: 'Scelta Comunicazionale', nodesByBranch: { default: { complexityRank: 1, stageMaxValue: 100, preChoiceEvolution: { headline: 'T1', narrative: 'Evoluzione prima della scelta 1', clinicalUpdates: [], decisionPrompt: 'Domanda 1' }, tiles: [] } } },
-      { level: 2, domainKey: 'investigativa', domainLabel: 'Scelta Investigativa / Esaminazione', nodesByBranch: { default: { complexityRank: 2, stageMaxValue: 150, preChoiceEvolution: { headline: 'T2', narrative: 'Evoluzione prima della scelta 2', clinicalUpdates: [], decisionPrompt: 'Domanda 2' }, tiles: [] } } },
-      { level: 3, domainKey: 'gestionale', domainLabel: 'Scelta Gestionale', nodesByBranch: { default: { complexityRank: 3, stageMaxValue: 200, preChoiceEvolution: { headline: 'T3', narrative: 'Evoluzione prima della scelta 3', clinicalUpdates: [], decisionPrompt: 'Domanda 3' }, tiles: [] } } },
-      { level: 4, domainKey: 'diagnostica', domainLabel: 'Scelta Diagnostica', nodesByBranch: { default: { complexityRank: 4, stageMaxValue: 250, preChoiceEvolution: { headline: 'T4', narrative: 'Evoluzione prima della scelta 4', clinicalUpdates: [], decisionPrompt: 'Domanda 4' }, tiles: [] } } },
-      { level: 5, domainKey: 'terapeutica', domainLabel: 'Scelta Terapeutica', nodesByBranch: { default: { complexityRank: 5, stageMaxValue: 300, preChoiceEvolution: { headline: 'T5', narrative: 'Evoluzione prima della scelta 5', clinicalUpdates: [], decisionPrompt: 'Domanda 5' }, tiles: [] } } },
-      { level: 6, domainKey: 'followup', domainLabel: 'Scelta Mantenimento / Follow-up', nodesByBranch: { default: { complexityRank: 6, stageMaxValue: 350, preChoiceEvolution: { headline: 'T6', narrative: 'Evoluzione prima della scelta 6', clinicalUpdates: [], decisionPrompt: 'Domanda 6' }, tiles: [] } } }
+    steps: [
+      {
+        stepNumber: 1,
+        title: 'Primo Avanzamento',
+        preChoiceEvolutionByBranch: {
+          default: { headline: 'Aggiornamento Evolutivo', narrative: 'Testo pre-scelta.' }
+        },
+        snodi: [
+          {
+            snodoId: 's1-1',
+            snodoCode: '1.1',
+            domainKey: 'comunicazionale',
+            domainLabel: 'Scelta Comunicazionale',
+            valueWeight: 100,
+            tiles: [
+              { id: 'S1-COM-A', headline: 'Scelta corretta', bodyText: 'Descrizione', isCorrect: true, qualityDeltaPct: 0, valuePoints: 100, feedbackText: 'Corretto.' },
+              { id: 'S1-COM-B', headline: 'Scelta errata', bodyText: 'Descrizione', isCorrect: false, qualityDeltaPct: -15, valuePoints: 0, feedbackText: 'Errato (-15% CQ).' }
+            ]
+          }
+        ]
+      }
     ]
   };
 
   return {
-    CASES_REGISTRY: [CALIBRATION_CASE, CASE_01_SLOT],
+    CASES_REGISTRY: [CASO_202_MATTEO, NEXT_CASE_SLOT],
     CASE_JSON_TEMPLATE
   };
 });

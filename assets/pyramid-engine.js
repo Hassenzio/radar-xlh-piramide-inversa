@@ -1,7 +1,8 @@
 /* ═══════════════════════════════════════════════════════════════════════
-   RADAR XLH — Piramide Inversa Decision Engine
-   Motore deterministico per casi clinici interattivi a snodi ramificati,
-   narrazione evolutiva pre-scelta, Coefficiente di Qualità (%) e scoring.
+   RADAR XLH — Piramide Inversa Multi-Snodo Engine
+   Supporta strutture piramidali a N Step progressivi con 1..K snodi
+   decisionali per step, ramificazione narrativa pre-scelta, Coefficiente
+   di Qualità (%) da 100% e ordinamento anti-bias deterministico dei Post-it.
    Compatibile con Browser (window.PyramidEngine) e Node.js (CommonJS).
    ═══════════════════════════════════════════════════════════════════════ */
 
@@ -14,61 +15,74 @@
 })(typeof globalThis !== 'undefined' ? globalThis : this, function () {
   'use strict';
 
-  const CANONICAL_DOMAINS = Object.freeze([
-    {
-      level: 1,
+  const DOMAIN_META = Object.freeze({
+    comunicazionale: {
       domainKey: 'comunicazionale',
       domainLabel: 'Scelta Comunicazionale',
-      shortLabel: 'Comunicazione',
-      accentColor: '#0E8AC8',
-      softBg: '#EBF5FB'
+      shortLabel: 'Comunicazionale',
+      accentColor: '#0E8AC8'
     },
-    {
-      level: 2,
+    investigativa: {
       domainKey: 'investigativa',
       domainLabel: 'Scelta Investigativa / Esaminazione',
-      shortLabel: 'Esaminazione',
-      accentColor: '#0284C7',
-      softBg: '#E0F2FE'
+      shortLabel: 'Investigativa',
+      accentColor: '#0284C7'
     },
-    {
-      level: 3,
+    gestionale: {
       domainKey: 'gestionale',
       domainLabel: 'Scelta Gestionale',
-      shortLabel: 'Gestione',
-      accentColor: '#1B3A5C',
-      softBg: '#E8EFF7'
+      shortLabel: 'Gestionale',
+      accentColor: '#1B3A5C'
     },
-    {
-      level: 4,
+    diagnostica: {
       domainKey: 'diagnostica',
       domainLabel: 'Scelta Diagnostica',
       shortLabel: 'Diagnostica',
-      accentColor: '#D97706',
-      softBg: '#FEF3C7'
+      accentColor: '#D97706'
     },
-    {
-      level: 5,
+    terapeutica: {
       domainKey: 'terapeutica',
       domainLabel: 'Scelta Terapeutica',
-      shortLabel: 'Terapia',
-      accentColor: '#E87C1E',
-      softBg: '#FDF3E8'
+      shortLabel: 'Terapeutica',
+      accentColor: '#E87C1E'
     },
-    {
-      level: 6,
+    followup: {
       domainKey: 'followup',
       domainLabel: 'Scelta Mantenimento / Follow-up',
       shortLabel: 'Follow-up',
-      accentColor: '#0F766E',
-      softBg: '#CCFBF1'
+      accentColor: '#0F766E'
     }
-  ]);
-
-  const VALID_OUTCOMES = new Set(['optimal', 'acceptable', 'error']);
+  });
 
   function clamp(val, min, max) {
     return Math.min(max, Math.max(min, val));
+  }
+
+  function hashString(str) {
+    let h = 2166136261;
+    for (let i = 0; i < str.length; i += 1) {
+      h ^= str.charCodeAt(i);
+      h = Math.imul(h, 16777619);
+    }
+    return h >>> 0;
+  }
+
+  /**
+   * Restituisce i Post-it dello snodo in ordine deterministico anti-bias
+   * (la risposta corretta non compare sistematicamente come prima opzione).
+   */
+  function getDisplayTiles(snodo) {
+    const tiles = [...(snodo.tiles || [])];
+    if (tiles.length <= 1) return tiles;
+    let seed = hashString(String(snodo.snodoId || snodo.snodoCode || 'snodo'));
+    for (let i = tiles.length - 1; i > 0; i -= 1) {
+      seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
+      const j = seed % (i + 1);
+      const tmp = tiles[i];
+      tiles[i] = tiles[j];
+      tiles[j] = tmp;
+    }
+    return tiles;
   }
 
   function getQualityBand(pct) {
@@ -77,7 +91,7 @@
       return {
         key: 'excellent',
         label: 'Eccellenza Clinica',
-        badgeText: 'Percorso Ottimale',
+        badgeText: 'Percorso Ottimale (≥ 90%)',
         color: '#059669'
       };
     }
@@ -118,128 +132,98 @@
       return { valid: false, isPending: false, errors };
     }
 
-    if (!meta.id || typeof meta.id !== 'string') {
-      errors.push('Campo "meta.id" obbligatorio.');
-    }
-    if (!meta.title || typeof meta.title !== 'string') {
-      errors.push('Campo "meta.title" obbligatorio.');
-    }
+    if (!meta.id || typeof meta.id !== 'string') errors.push('Campo "meta.id" obbligatorio.');
+    if (!meta.title || typeof meta.title !== 'string') errors.push('Campo "meta.title" obbligatorio.');
 
     if (meta.status === 'pending_case') {
       return { valid: errors.length === 0, isPending: true, errors };
     }
 
     if (!caseObj.apex || typeof caseObj.apex !== 'object') {
-      errors.push('Sezione "apex" (tile vertice della piramide) mancante.');
+      errors.push('Sezione "apex" (Step 0) mancante.');
     } else {
       if (!caseObj.apex.title) errors.push('Campo "apex.title" mancante.');
-      if (!caseObj.apex.narrativeIntro) errors.push('Campo "apex.narrativeIntro" mancante.');
     }
 
-    if (!Array.isArray(caseObj.levels) || caseObj.levels.length !== 6) {
-      errors.push('La proprietà "levels" deve contenere esattamente 6 snodi decisionali.');
-    } else {
-      let maxPossibleScore = 0;
-      let defaultTilesCount = 1; // 1 apex tile
+    if (!Array.isArray(caseObj.steps) || caseObj.steps.length === 0) {
+      errors.push('La proprietà "steps" deve contenere almeno 1 step.');
+      return { valid: false, isPending: false, errors };
+    }
 
-      caseObj.levels.forEach((lvl, idx) => {
-        const expected = CANONICAL_DOMAINS[idx];
-        if (!lvl || typeof lvl !== 'object') {
-          errors.push(`Livello ${idx + 1} non valido.`);
+    let snodiCount = 0;
+    let totalDecisionTiles = 0;
+    let maxPossibleScore = 0;
+
+    caseObj.steps.forEach((step, idx) => {
+      const expectedStep = idx + 1;
+      if (!step || typeof step !== 'object') {
+        errors.push(`Step ${expectedStep} non valido.`);
+        return;
+      }
+      if (step.stepNumber !== expectedStep) {
+        errors.push(`Step ${expectedStep}: "stepNumber" deve essere ${expectedStep}.`);
+      }
+      if (!step.preChoiceEvolutionByBranch || !step.preChoiceEvolutionByBranch.default) {
+        errors.push(`Step ${expectedStep}: "preChoiceEvolutionByBranch.default" è obbligatorio.`);
+      }
+      if (!Array.isArray(step.snodi) || step.snodi.length === 0) {
+        errors.push(`Step ${expectedStep}: deve contenere almeno 1 snodo.`);
+        return;
+      }
+
+      step.snodi.forEach((snodo) => {
+        snodiCount += 1;
+        if (!snodo.snodoId || !snodo.snodoCode) {
+          errors.push(`Step ${expectedStep}: snodo privo di "snodoId" o "snodoCode".`);
+        }
+        if (!DOMAIN_META[snodo.domainKey]) {
+          errors.push(`Snodo ${snodo.snodoCode || '?'}: "domainKey" non riconosciuto ("${snodo.domainKey}").`);
+        }
+        if (typeof snodo.valueWeight !== 'number' || snodo.valueWeight <= 0) {
+          errors.push(`Snodo ${snodo.snodoCode || '?'}: "valueWeight" deve essere > 0.`);
+        } else {
+          maxPossibleScore += snodo.valueWeight;
+        }
+        if (!Array.isArray(snodo.tiles) || snodo.tiles.length < 2) {
+          errors.push(`Snodo ${snodo.snodoCode || '?'}: servono almeno 2 tile/post-it.`);
           return;
         }
-        if (lvl.level !== expected.level) {
-          errors.push(`Livello ${idx + 1}: "level" deve essere ${expected.level}.`);
-        }
-        if (lvl.domainKey !== expected.domainKey) {
-          errors.push(`Livello ${idx + 1}: "domainKey" atteso "${expected.domainKey}", trovato "${lvl.domainKey}".`);
-        }
-        if (!lvl.nodesByBranch || typeof lvl.nodesByBranch !== 'object' || !lvl.nodesByBranch.default) {
-          errors.push(`Livello ${idx + 1}: "nodesByBranch.default" è obbligatorio.`);
-          return;
-        }
 
-        const branchKeys = Object.keys(lvl.nodesByBranch);
-        branchKeys.forEach((branchKey) => {
-          const node = lvl.nodesByBranch[branchKey];
-          if (!node || !node.preChoiceEvolution) {
-            errors.push(`Livello ${idx + 1} (${branchKey}): "preChoiceEvolution" mancante.`);
-          } else {
-            if (!node.preChoiceEvolution.headline) {
-              errors.push(`Livello ${idx + 1} (${branchKey}): "preChoiceEvolution.headline" mancante.`);
-            }
-            if (!node.preChoiceEvolution.narrative) {
-              errors.push(`Livello ${idx + 1} (${branchKey}): "preChoiceEvolution.narrative" mancante.`);
-            }
-            if (!node.preChoiceEvolution.decisionPrompt) {
-              errors.push(`Livello ${idx + 1} (${branchKey}): "preChoiceEvolution.decisionPrompt" mancante.`);
-            }
+        let hasCorrect = false;
+        let hasError = false;
+        snodo.tiles.forEach((tile) => {
+          totalDecisionTiles += 1;
+          if (!tile.id || !tile.headline || !tile.bodyText) {
+            errors.push(`Snodo ${snodo.snodoCode} tile ${tile.id || '?'}: campi obbligatori mancanti.`);
           }
-
-          if (typeof node.stageMaxValue !== 'number' || node.stageMaxValue <= 0) {
-            errors.push(`Livello ${idx + 1} (${branchKey}): "stageMaxValue" deve essere un numero > 0.`);
-          } else if (branchKey === 'default') {
-            maxPossibleScore += node.stageMaxValue;
+          if (typeof tile.isCorrect !== 'boolean') {
+            errors.push(`Snodo ${snodo.snodoCode} tile ${tile.id}: "isCorrect" deve essere boolean.`);
           }
-
-          if (!Array.isArray(node.tiles) || node.tiles.length < 2) {
-            errors.push(`Livello ${idx + 1} (${branchKey}): servono almeno 2 tile decisionali.`);
-          } else {
-            if (branchKey === 'default') {
-              defaultTilesCount += node.tiles.length;
-            }
-            let hasValidOption = false;
-            let hasErrorOption = false;
-
-            node.tiles.forEach((tile, tIdx) => {
-              if (!tile.id || !tile.code || !tile.shortTitle || !tile.bodyText) {
-                errors.push(`Livello ${idx + 1} (${branchKey}) tile #${tIdx + 1}: campi identificativi o testo incompleti.`);
-              }
-              if (!VALID_OUTCOMES.has(tile.outcomeType)) {
-                errors.push(`Livello ${idx + 1} (${branchKey}) tile ${tile.id || tIdx}: "outcomeType" non valido.`);
-              }
-              if (typeof tile.qualityDeltaPct !== 'number' || tile.qualityDeltaPct > 0) {
-                errors.push(`Livello ${idx + 1} (${branchKey}) tile ${tile.id || tIdx}: "qualityDeltaPct" deve essere <= 0.`);
-              }
-              if (typeof tile.valuePoints !== 'number' || tile.valuePoints < 0) {
-                errors.push(`Livello ${idx + 1} (${branchKey}) tile ${tile.id || tIdx}: "valuePoints" deve essere >= 0.`);
-              }
-              if (!tile.feedbackRationale) {
-                errors.push(`Livello ${idx + 1} (${branchKey}) tile ${tile.id || tIdx}: "feedbackRationale" mancante.`);
-              }
-              if (tile.outcomeType === 'optimal' || tile.outcomeType === 'acceptable') {
-                hasValidOption = true;
-              }
-              if (tile.outcomeType === 'error') {
-                hasErrorOption = true;
-              }
-            });
-
-            if (!hasValidOption) {
-              errors.push(`Livello ${idx + 1} (${branchKey}): deve includere almeno una opzione ottimale o accettabile.`);
-            }
-            if (!hasErrorOption) {
-              errors.push(`Livello ${idx + 1} (${branchKey}): deve includere almeno una opzione errata con decurtazione %.`);
-            }
+          if (typeof tile.qualityDeltaPct !== 'number' || tile.qualityDeltaPct > 0) {
+            errors.push(`Snodo ${snodo.snodoCode} tile ${tile.id}: "qualityDeltaPct" deve essere <= 0.`);
           }
+          if (!tile.feedbackText) {
+            errors.push(`Snodo ${snodo.snodoCode} tile ${tile.id}: "feedbackText" mancante.`);
+          }
+          if (tile.isCorrect) hasCorrect = true;
+          else hasError = true;
         });
-      });
 
-      return {
-        valid: errors.length === 0,
-        isPending: false,
-        errors,
-        summary: {
-          maxPossibleScore,
-          defaultTilesCount
-        }
-      };
-    }
+        if (!hasCorrect) errors.push(`Snodo ${snodo.snodoCode}: manca l'opzione corretta.`);
+        if (!hasError) errors.push(`Snodo ${snodo.snodoCode}: manca almeno un'opzione errata con penalità %.`);
+      });
+    });
 
     return {
       valid: errors.length === 0,
       isPending: false,
-      errors
+      errors,
+      summary: {
+        stepsCount: caseObj.steps.length,
+        snodiCount,
+        totalDecisionTiles,
+        maxPossibleScore
+      }
     };
   }
 
@@ -253,206 +237,175 @@
       );
     }
 
+    const totalSteps = caseData.steps.length;
+    const totalSnodi = validation.summary.snodiCount;
+    const maxPossibleScore = validation.summary.maxPossibleScore;
     const initialQualityPct = Number(caseData.meta.initialQualityPct ?? 100);
     const passThresholdPct = Number(caseData.meta.passThresholdPct ?? 75);
 
     const state = savedSnapshot && savedSnapshot.caseId === caseData.meta.id
       ? {
           caseId: savedSnapshot.caseId,
-          apexReviewed: Boolean(savedSnapshot.apexReviewed),
           qualityPct: clamp(Number(savedSnapshot.qualityPct ?? initialQualityPct), 0, 100),
           valueScore: Math.max(0, Number(savedSnapshot.valueScore ?? 0)),
-          activeLevel: clamp(Number(savedSnapshot.activeLevel ?? 1), 1, 6),
+          activeStep: clamp(Number(savedSnapshot.activeStep ?? 1), 1, totalSteps),
           completed: Boolean(savedSnapshot.completed),
           branchHistory: { 1: 'default', ...(savedSnapshot.branchHistory || {}) },
-          resolvedLevels: { ...(savedSnapshot.resolvedLevels || {}) },
-          attemptsLog: Array.isArray(savedSnapshot.attemptsLog) ? [...savedSnapshot.attemptsLog] : [],
-          penalizedTileKeys: Array.isArray(savedSnapshot.penalizedTileKeys) ? [...savedSnapshot.penalizedTileKeys] : []
+          resolvedSnodi: { ...(savedSnapshot.resolvedSnodi || {}) },
+          attemptsLog: Array.isArray(savedSnapshot.attemptsLog) ? [...savedSnapshot.attemptsLog] : []
         }
       : {
           caseId: caseData.meta.id,
-          apexReviewed: false,
           qualityPct: initialQualityPct,
           valueScore: 0,
-          activeLevel: 1,
+          activeStep: 1,
           completed: false,
           branchHistory: { 1: 'default' },
-          resolvedLevels: {},
-          attemptsLog: [],
-          penalizedTileKeys: []
+          resolvedSnodi: {},
+          attemptsLog: []
         };
 
-    function getMaxPossibleScore() {
-      return caseData.levels.reduce((sum, lvl, index) => {
-        const branchKey = state.branchHistory[index + 1] || 'default';
-        const node = lvl.nodesByBranch[branchKey] || lvl.nodesByBranch.default;
-        return sum + (node ? node.stageMaxValue : 0);
-      }, 0);
+    function getStepConfig(stepNumber) {
+      return caseData.steps.find((s) => s.stepNumber === stepNumber) || null;
     }
 
-    function getLevelConfig(levelNumber) {
-      return caseData.levels.find((l) => l.level === levelNumber) || null;
+    function findSnodoLocation(snodoId) {
+      for (const step of caseData.steps) {
+        const snodo = step.snodi.find((sn) => sn.snodoId === snodoId);
+        if (snodo) return { step, snodo };
+      }
+      return null;
     }
 
-    function getNodeForLevel(levelNumber) {
-      const levelCfg = getLevelConfig(levelNumber);
-      if (!levelCfg) return null;
-      const branchKey = state.branchHistory[levelNumber] || 'default';
-      return levelCfg.nodesByBranch[branchKey] || levelCfg.nodesByBranch.default;
-    }
-
-    function getBranchKeyForLevel(levelNumber) {
-      const levelCfg = getLevelConfig(levelNumber);
-      if (!levelCfg) return 'default';
-      const candidate = state.branchHistory[levelNumber] || 'default';
-      return levelCfg.nodesByBranch[candidate] ? candidate : 'default';
-    }
-
-    function getLevelStatus(levelNumber) {
-      if (state.resolvedLevels[levelNumber]) return 'resolved';
-      if (!state.completed && state.activeLevel === levelNumber) return 'active';
+    function getStepStatus(stepNumber) {
+      const step = getStepConfig(stepNumber);
+      if (!step) return 'locked';
+      const allResolved = step.snodi.every((sn) => Boolean(state.resolvedSnodi[sn.snodoId]));
+      if (allResolved) return 'resolved';
+      if (!state.completed && state.activeStep === stepNumber) return 'active';
       return 'locked';
     }
 
-    function markApexReviewed() {
-      state.apexReviewed = true;
-      return getSnapshot();
+    function getStepPreChoiceEvolution(stepNumber) {
+      const step = getStepConfig(stepNumber);
+      if (!step) return null;
+      const branchKey = state.branchHistory[stepNumber] || 'default';
+      return step.preChoiceEvolutionByBranch[branchKey] || step.preChoiceEvolutionByBranch.default;
     }
 
-    function selectTile(levelNumber, tileId) {
+    function getActiveSnodoPointer() {
+      if (state.completed) return null;
+      const step = getStepConfig(state.activeStep);
+      if (!step) return null;
+      return step.snodi.find((sn) => !state.resolvedSnodi[sn.snodoId]) || step.snodi[0];
+    }
+
+    function selectTile(snodoId, tileId) {
       if (state.completed) {
         throw new Error('Il caso clinico è già stato completato.');
       }
-      if (levelNumber !== state.activeLevel) {
-        throw new Error(`Lo snodo ${levelNumber} non è attivo (snodo corrente: ${state.activeLevel}).`);
+      const loc = findSnodoLocation(snodoId);
+      if (!loc) {
+        throw new Error(`Snodo "${snodoId}" non trovato.`);
+      }
+      const { step, snodo } = loc;
+      if (step.stepNumber !== state.activeStep) {
+        throw new Error(`Lo snodo ${snodo.snodoCode} appartiene allo Step ${step.stepNumber} (Step attivo: ${state.activeStep}).`);
+      }
+      if (state.resolvedSnodi[snodoId]) {
+        throw new Error(`Lo snodo ${snodo.snodoCode} è già stato completato.`);
       }
 
-      const levelCfg = getLevelConfig(levelNumber);
-      const node = getNodeForLevel(levelNumber);
-      if (!levelCfg || !node) {
-        throw new Error(`Nodo non trovato per il livello ${levelNumber}.`);
-      }
-
-      const tile = node.tiles.find((t) => t.id === tileId);
+      const tile = snodo.tiles.find((t) => t.id === tileId);
       if (!tile) {
-        throw new Error(`Tile "${tileId}" non presente nel livello ${levelNumber}.`);
+        throw new Error(`Tile "${tileId}" non presente nello snodo ${snodo.snodoCode}.`);
       }
 
-      const tileKey = `${levelNumber}:${tileId}`;
-      const alreadyPenalized = state.penalizedTileKeys.includes(tileKey);
       const qualityBefore = state.qualityPct;
-
-      let appliedDelta = 0;
-      if (tile.qualityDeltaPct < 0 && !alreadyPenalized) {
-        appliedDelta = tile.qualityDeltaPct;
-        state.qualityPct = clamp(state.qualityPct + appliedDelta, 0, 100);
-        state.penalizedTileKeys.push(tileKey);
-      }
-
+      const delta = tile.qualityDeltaPct < 0 ? tile.qualityDeltaPct : 0;
+      state.qualityPct = clamp(state.qualityPct + delta, 0, 100);
       const qualityAfter = state.qualityPct;
-      const attemptsBeforeOnLevel = state.attemptsLog.filter((a) => a.level === levelNumber).length;
-      const shouldAdvance = tile.advanceOnSelect !== false;
 
-      const logEntry = {
-        level: levelNumber,
-        domainKey: levelCfg.domainKey,
-        domainLabel: levelCfg.domainLabel,
-        branchUsed: getBranchKeyForLevel(levelNumber),
+      const awardedValue = tile.isCorrect ? snodo.valueWeight : 0;
+      state.valueScore += awardedValue;
+
+      const correctTile = snodo.tiles.find((t) => t.isCorrect) || snodo.tiles[0];
+
+      const record = {
+        stepNumber: step.stepNumber,
+        snodoId: snodo.snodoId,
+        snodoCode: snodo.snodoCode,
+        domainKey: snodo.domainKey,
+        domainLabel: snodo.domainLabel,
         tileId: tile.id,
-        tileCode: tile.code,
-        shortTitle: tile.shortTitle,
-        outcomeType: tile.outcomeType,
-        qualityDeltaRequested: tile.qualityDeltaPct,
-        appliedQualityDelta: appliedDelta,
+        headline: tile.headline,
+        bodyText: tile.bodyText,
+        isCorrect: tile.isCorrect,
+        qualityDeltaPct: delta,
         qualityBefore,
         qualityAfter,
-        valuePoints: shouldAdvance ? tile.valuePoints : 0,
-        advanced: shouldAdvance,
+        valuePoints: awardedValue,
+        maxValuePoints: snodo.valueWeight,
+        feedbackText: tile.feedbackText,
+        evolutionImpact: tile.evolutionImpact || '',
+        nextBranchKey: tile.nextBranchKey || 'default',
+        correctTileId: correctTile.id,
+        correctHeadline: correctTile.headline,
+        correctFeedbackText: correctTile.feedbackText,
         timestamp: new Date().toISOString()
       };
-      state.attemptsLog.push(logEntry);
 
-      let nextBranchKey = tile.nextBranchKey || 'default';
+      state.resolvedSnodi[snodoId] = record;
+      state.attemptsLog.push(record);
 
-      if (shouldAdvance) {
-        state.valueScore += tile.valuePoints;
+      const stepFinished = step.snodi.every((sn) => Boolean(state.resolvedSnodi[sn.snodoId]));
+      let stepAdvanced = false;
 
-        const optimalTile = node.tiles.find((t) => t.outcomeType === 'optimal') || node.tiles[0];
-        state.resolvedLevels[levelNumber] = {
-          level: levelNumber,
-          domainKey: levelCfg.domainKey,
-          domainLabel: levelCfg.domainLabel,
-          branchUsed: getBranchKeyForLevel(levelNumber),
-          tileId: tile.id,
-          tileCode: tile.code,
-          shortTitle: tile.shortTitle,
-          bodyText: tile.bodyText,
-          outcomeType: tile.outcomeType,
-          qualityDeltaPct: appliedDelta,
-          qualityBefore,
-          qualityAfter,
-          valuePoints: tile.valuePoints,
-          stageMaxValue: node.stageMaxValue,
-          firstTryOptimal: attemptsBeforeOnLevel === 0 && tile.outcomeType === 'optimal',
-          attemptsOnLevel: attemptsBeforeOnLevel + 1,
-          nextBranchKey,
-          feedbackTitle: tile.feedbackTitle || tile.shortTitle,
-          feedbackRationale: tile.feedbackRationale,
-          patientImpact: tile.patientImpact || '',
-          preChoiceHeadline: node.preChoiceEvolution.headline,
-          preChoiceNarrative: node.preChoiceEvolution.narrative,
-          optimalTileId: optimalTile.id,
-          optimalTileCode: optimalTile.code,
-          optimalTileTitle: optimalTile.shortTitle,
-          optimalRationale: optimalTile.feedbackRationale
-        };
-
-        if (levelNumber < 6) {
-          const nextLevel = levelNumber + 1;
-          state.activeLevel = nextLevel;
-          state.branchHistory[nextLevel] = nextBranchKey;
+      if (stepFinished) {
+        if (step.stepNumber < totalSteps) {
+          const nextStepNum = step.stepNumber + 1;
+          const nextStepCfg = getStepConfig(nextStepNum);
+          let chosenBranch = 'default';
+          for (const sn of step.snodi) {
+            const r = state.resolvedSnodi[sn.snodoId];
+            if (r && r.nextBranchKey && nextStepCfg?.preChoiceEvolutionByBranch?.[r.nextBranchKey]) {
+              chosenBranch = r.nextBranchKey;
+              break;
+            }
+          }
+          state.activeStep = nextStepNum;
+          state.branchHistory[nextStepNum] = chosenBranch;
+          stepAdvanced = true;
         } else {
           state.completed = true;
         }
       }
 
       return {
-        level: levelNumber,
-        tile,
-        appliedQualityDelta: appliedDelta,
-        alreadyPenalized,
-        qualityBefore,
-        qualityAfter,
-        valueAwarded: shouldAdvance ? tile.valuePoints : 0,
-        advanced: shouldAdvance,
-        nextLevel: shouldAdvance && levelNumber < 6 ? levelNumber + 1 : null,
+        record,
+        stepFinished,
+        stepAdvanced,
         completed: state.completed,
-        nextBranchKey,
+        nextStepNumber: stepAdvanced ? state.activeStep : null,
         snapshot: getSnapshot()
       };
     }
 
     function getFinalReport() {
-      const resolvedList = [];
-      let optimalCount = 0;
-      let acceptableCount = 0;
+      const timeline = [];
+      let correctCount = 0;
       let errorCount = 0;
-      let firstTryOptimalCount = 0;
 
-      for (let lvl = 1; lvl <= 6; lvl += 1) {
-        const item = state.resolvedLevels[lvl];
-        if (item) {
-          resolvedList.push(item);
-          if (item.outcomeType === 'optimal') optimalCount += 1;
-          else if (item.outcomeType === 'acceptable') acceptableCount += 1;
-          else errorCount += 1;
-          if (item.firstTryOptimal) firstTryOptimalCount += 1;
-        }
-      }
-
-      const maxPossibleScore = getMaxPossibleScore();
-      const scorePct = maxPossibleScore > 0 ? Math.round((state.valueScore / maxPossibleScore) * 100) : 0;
-      const errorAttemptsCount = state.attemptsLog.filter((a) => a.outcomeType === 'error').length;
+      caseData.steps.forEach((step) => {
+        step.snodi.forEach((snodo) => {
+          const rec = state.resolvedSnodi[snodo.snodoId];
+          if (rec) {
+            timeline.push(rec);
+            if (rec.isCorrect) correctCount += 1;
+            else errorCount += 1;
+          }
+        });
+      });
 
       return {
         caseMeta: caseData.meta,
@@ -464,50 +417,51 @@
         qualityBand: getQualityBand(state.qualityPct),
         totalValueScore: state.valueScore,
         maxPossibleScore,
-        scorePct,
-        optimalCount,
-        acceptableCount,
+        correctCount,
         errorCount,
-        errorAttemptsCount,
-        firstTryOptimalCount,
-        resolvedCount: resolvedList.length,
-        timeline: resolvedList
+        resolvedSnodiCount: timeline.length,
+        totalSnodiCount: totalSnodi,
+        timeline
       };
     }
 
     function getSnapshot() {
+      const resolvedCount = Object.keys(state.resolvedSnodi).length;
+      const activeSnodo = getActiveSnodoPointer();
       return {
         caseId: state.caseId,
-        apexReviewed: state.apexReviewed,
         qualityPct: state.qualityPct,
         valueScore: state.valueScore,
-        maxPossibleScore: getMaxPossibleScore(),
-        activeLevel: state.activeLevel,
+        maxPossibleScore,
+        activeStep: state.activeStep,
+        totalSteps,
+        resolvedSnodiCount: resolvedCount,
+        totalSnodiCount: totalSnodi,
+        activeSnodo,
         completed: state.completed,
         branchHistory: { ...state.branchHistory },
-        resolvedLevels: { ...state.resolvedLevels },
+        resolvedSnodi: { ...state.resolvedSnodi },
         attemptsLog: [...state.attemptsLog],
-        penalizedTileKeys: [...state.penalizedTileKeys],
         qualityBand: getQualityBand(state.qualityPct)
       };
     }
 
     return {
       caseData,
-      markApexReviewed,
-      getLevelConfig,
-      getNodeForLevel,
-      getBranchKeyForLevel,
-      getLevelStatus,
+      getDisplayTiles,
+      getStepConfig,
+      getStepStatus,
+      getStepPreChoiceEvolution,
+      getActiveSnodoPointer,
       selectTile,
-      getMaxPossibleScore,
       getFinalReport,
       getSnapshot
     };
   }
 
   return {
-    CANONICAL_DOMAINS,
+    DOMAIN_META,
+    getDisplayTiles,
     getQualityBand,
     validateCaseSchema,
     createSession

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>RADAR XLH — Casi Clinici Interattivi a Piramide Inversa</title>
+  <title>RADAR XLH — Caso Clinico Interattivo a Piramide Inversa</title>
   <meta name="description" content="Tool interattivo narrativo a Post-it / Tile dinamici in Piramide Inversa Discendente per i casi clinici del percorso ECM RADAR XLH.">
   <meta name="robots" content="noindex, nofollow">
 
@@ -25,7 +25,7 @@
         <img src="assets/img/logo.png" alt="Logo RADAR XLH" class="hud-logo">
         <div class="hud-brand-text">
           <div class="hud-title">RADAR <span>XLH</span> · Piramide Inversa</div>
-          <div class="hud-subtitle">Casi Clinici Interattivi a Snodi Decisionali</div>
+          <div class="hud-subtitle">Casi Clinici Interattivi Narrativi</div>
         </div>
       </div>
 
@@ -41,7 +41,7 @@
             <circle class="cq-ring-fill" id="cqRingFill" cx="22" cy="22" r="18"></circle>
           </svg>
           <div class="cq-meta">
-            <span class="cq-label">Coeff. Qualità</span>
+            <span class="cq-label">Coeff. Qualità (CQ)</span>
             <span class="cq-value-row">
               <strong id="hudQualityValue">100%</strong>
               <span id="hudQualityDelta" class="cq-delta-pill" hidden></span>
@@ -49,14 +49,19 @@
           </div>
         </div>
 
-        <div class="score-widget" title="Valore decisionale accumulato negli snodi">
-          <span class="score-label">Valore Snodi</span>
-          <strong class="score-value"><span id="hudScoreValue">0</span> <small id="hudScoreMax">/ 1350 pt</small></strong>
+        <div class="step-hud-widget">
+          <span class="score-label">Step <strong id="hudStepCounter" style="color:#fff;">1 di 5</strong> · <span id="hudSnodiCounter">0/15</span></span>
+          <div class="step-pills" id="hudStepPills"></div>
         </div>
 
-        <div class="progress-widget" aria-label="Avanzamento snodi">
-          <span class="score-label">Snodi</span>
-          <div class="step-pills" id="hudStepPills"></div>
+        <div class="active-snodo-widget">
+          <span class="score-label">Snodo Attivo</span>
+          <strong class="active-snodo-label" id="hudActiveSnodo">Scelta Comunicazionale</strong>
+        </div>
+
+        <div class="score-widget" title="Valore decisionale accumulato">
+          <span class="score-label">Valore</span>
+          <strong class="score-value"><span id="hudScoreValue">0</span> <small id="hudScoreMax">/ 1500 pt</small></strong>
         </div>
       </div>
 
@@ -89,7 +94,7 @@
       <div class="board-controls">
         <div class="view-mode-group" role="group" aria-label="Modalità visualizzazione piramide">
           <button type="button" class="btn-view active" id="btnModeFull" data-view-mode="full">Piramide Completa</button>
-          <button type="button" class="btn-view" id="btnModeFocus" data-view-mode="focus">Focus Snodo Attivo</button>
+          <button type="button" class="btn-view" id="btnModeFocus" data-view-mode="focus">Focus Step Attivo</button>
         </div>
 
         <div class="zoom-group" role="group" aria-label="Scala piramide">
@@ -100,10 +105,10 @@
       </div>
     </section>
 
-    <!-- Legenda Domini Decisionali (6 livelli discendenti) -->
-    <section class="domain-legend-bar" id="domainLegendBar" aria-label="Legenda snodi decisionali della piramide"></section>
+    <!-- Legenda Domini Decisionali -->
+    <section class="domain-legend-bar" id="domainLegendBar" aria-label="Legenda categorie decisionali"></section>
 
-    <!-- ══════════════════ AREA SLOT IN ATTESA (SE CASO #01 NON ANCORA CARICATO) ══════════════════ -->
+    <!-- ══════════════════ AREA SLOT IN ATTESA ══════════════════ -->
     <section class="pending-slot-view" id="pendingSlotView" hidden></section>
 
     <!-- ══════════════════ LAVAGNA PIRAMIDE INVERSA DISCENDENTE ══════════════════ -->
@@ -119,13 +124,12 @@
     <section class="debriefing-section" id="finalDebriefingSection" hidden aria-label="Report finale e debriefing clinico"></section>
   </main>
 
-  <!-- Toast Live per variazione % CQ -->
   <div class="telemetry-toast" id="telemetryToast" role="status" aria-live="polite" hidden></div>
 
   <!-- ══════════════════ DIALOG 1: DETTAGLIO POST-IT, CONFERMA E FEEDBACK ══════════════════ -->
   <dialog id="tileDecisionDialog" class="radar-dialog dialog-decision" closedby="any" aria-labelledby="decisionDialogTitle">
     <div class="dialog-shell">
-      <header class="dialog-header" id="decisionDialogHeader">
+      <header class="dialog-header">
         <div class="dialog-header-meta">
           <span class="dialog-domain-pill" id="decisionDomainPill"></span>
           <span class="dialog-code-pill" id="decisionCodePill"></span>
@@ -135,7 +139,7 @@
         </button>
       </header>
 
-      <div class="dialog-body" id="decisionDialogBody">
+      <div class="dialog-body">
         <h1 class="dialog-title" id="decisionDialogTitle"></h1>
         <div id="decisionDynamicContent"></div>
       </div>
@@ -191,13 +195,13 @@
 
         <div class="share-block">
           <h2>2. Carica / Testa un Nuovo Caso Clinico (.json)</h2>
-          <p class="share-desc">Valida e testa istantaneamente nel browser la struttura di un nuovo caso clinico a 6 snodi prima dell'inserimento definitivo nel repository.</p>
+          <p class="share-desc">Valida e testa istantaneamente nel browser la struttura di un nuovo caso clinico multi-snodo prima dell'inserimento nel repository.</p>
           <div class="json-actions-row">
             <label class="btn-primary-sm file-upload-btn">
               <input type="file" id="jsonFileInput" accept=".json,application/json" hidden>
               Carica File .JSON
             </label>
-            <button type="button" class="btn-secondary-sm" id="btnDownloadTemplate">Scarica Template JSON Caso #01</button>
+            <button type="button" class="btn-secondary-sm" id="btnDownloadTemplate">Scarica Template JSON</button>
           </div>
           <div id="jsonUploadFeedback" class="upload-feedback" hidden></div>
         </div>
