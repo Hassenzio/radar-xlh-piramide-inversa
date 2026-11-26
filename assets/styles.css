@@ -189,12 +189,14 @@ body:not(.is-launcher) .hud-launcher-pill {
 .hud-telemetry {
   display: flex;
   align-items: center;
-  gap: 13px;
+  gap: 12px;
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.14);
   border-radius: 999px;
-  padding: 5px 15px 5px 11px;
+  padding: 5px 14px 5px 10px;
   min-width: 0;
+  flex: 0 1 auto;
+  overflow: hidden;
 }
 
 .cq-gauge-widget {
@@ -270,7 +272,17 @@ body:not(.is-launcher) .hud-launcher-pill {
 
 .step-hud-widget, .active-snodo-widget {
   border-left: 1px solid rgba(255, 255, 255, 0.14);
-  padding-left: 14px;
+  padding-left: 12px;
+}
+
+.step-hud-widget {
+  flex-shrink: 0;
+}
+
+.active-snodo-widget {
+  min-width: 0;
+  flex: 1 1 auto;
+  overflow: hidden;
 }
 
 .step-pills {
@@ -312,10 +324,12 @@ body:not(.is-launcher) .hud-launcher-pill {
 }
 
 .active-snodo-value {
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  gap: 7px;
+  gap: 6px;
   margin-top: 1px;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .active-snodo-dot {
@@ -327,17 +341,37 @@ body:not(.is-launcher) .hud-launcher-pill {
 }
 
 .active-snodo-label {
-  font-size: 0.79rem;
+  font-size: 0.77rem;
   color: #E0F2FE;
   font-weight: 700;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
 }
 
 .hud-actions {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 7px;
   flex-shrink: 0;
+}
+
+@media (max-width: 1340px) {
+  .hud-inner {
+    padding: 9px 14px;
+    gap: 10px;
+  }
+  .hud-subtitle {
+    display: none;
+  }
+  .hud-actions {
+    gap: 6px;
+  }
+  .btn-hud {
+    padding: 6px 10px;
+    font-size: 0.72rem;
+  }
 }
 
 .btn-hud {
