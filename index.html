@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>RADAR XLH — Caso Clinico Interattivo a Piramide Inversa</title>
-  <meta name="description" content="Tool interattivo narrativo a Post-it / Tile dinamici in Piramide Inversa Discendente per i casi clinici del percorso ECM RADAR XLH.">
+  <meta name="description" content="Percorso formativo interattivo a Piramide Inversa per la gestione clinica multidisciplinare dell'Ipofosfatemia X-Linked.">
   <meta name="robots" content="noindex, nofollow">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -18,30 +18,25 @@
   <div class="radar-backdrop-rings" aria-hidden="true"></div>
   <div class="radar-fondale-watermark" aria-hidden="true"></div>
 
-  <!-- ══════════════════ HUD SUPERIORE DI TELEMETRIA CLINICA ══════════════════ -->
-  <header class="hud-header" role="banner">
+  <!-- ══════════════════ HUD DIDATTICO SU RIGA SINGOLA ══════════════════ -->
+  <header class="hud-header" id="hudHeader" role="banner">
     <div class="hud-inner">
       <div class="hud-brand">
         <img src="assets/img/logo.png" alt="Logo RADAR XLH" class="hud-logo">
         <div class="hud-brand-text">
-          <div class="hud-title">RADAR <span>XLH</span> · Piramide Inversa</div>
-          <div class="hud-subtitle">Casi Clinici Interattivi Narrativi</div>
+          <div class="hud-title">RADAR <span>XLH</span></div>
+          <div class="hud-subtitle">Caso Clinico · Piramide Inversa</div>
         </div>
       </div>
 
-      <div class="hud-case-picker">
-        <label for="caseSelector" class="sr-only">Seleziona Caso Clinico</label>
-        <select id="caseSelector" class="case-select" aria-label="Seleziona Caso Clinico"></select>
-      </div>
-
       <div class="hud-telemetry" aria-live="polite">
-        <div class="cq-gauge-widget" id="cqGaugeWidget" title="Coefficiente di Qualità (inizia al 100%, decurtato a ogni errore)">
+        <div class="cq-gauge-widget" title="Coefficiente di Qualità Clinica (parte dal 100%)">
           <svg class="cq-ring" viewBox="0 0 44 44" aria-hidden="true">
             <circle class="cq-ring-bg" cx="22" cy="22" r="18"></circle>
             <circle class="cq-ring-fill" id="cqRingFill" cx="22" cy="22" r="18"></circle>
           </svg>
           <div class="cq-meta">
-            <span class="cq-label">Coeff. Qualità (CQ)</span>
+            <span class="hud-kicker">Coefficiente Qualità</span>
             <span class="cq-value-row">
               <strong id="hudQualityValue">100%</strong>
               <span id="hudQualityDelta" class="cq-delta-pill" hidden></span>
@@ -50,69 +45,53 @@
         </div>
 
         <div class="step-hud-widget">
-          <span class="score-label">Step <strong id="hudStepCounter" style="color:#fff;">1 di 5</strong> · <span id="hudSnodiCounter">0/15</span></span>
+          <span class="hud-kicker">Step <strong id="hudStepCounter">1 di 5</strong></span>
           <div class="step-pills" id="hudStepPills"></div>
         </div>
 
         <div class="active-snodo-widget">
-          <span class="score-label">Snodo Attivo</span>
-          <strong class="active-snodo-label" id="hudActiveSnodo">Scelta Comunicazionale</strong>
-        </div>
-
-        <div class="score-widget" title="Valore decisionale accumulato">
-          <span class="score-label">Valore</span>
-          <strong class="score-value"><span id="hudScoreValue">0</span> <small id="hudScoreMax">/ 1500 pt</small></strong>
+          <span class="hud-kicker">Snodo Attivo</span>
+          <span class="active-snodo-value">
+            <span class="active-snodo-dot" id="hudSnodoDot" aria-hidden="true"></span>
+            <strong class="active-snodo-label" id="hudActiveSnodo">1.1 · Scelta Comunicazionale</strong>
+          </span>
         </div>
       </div>
 
       <div class="hud-actions">
-        <button type="button" class="btn-hud" id="btnOpenTimeline" title="Apri Cartella & Narrazione Evolutiva">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-          <span>Cartella Evolutiva</span>
+        <button type="button" class="btn-hud btn-hud-diary" id="btnOpenTimeline">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          <span>Diario Clinico</span>
         </button>
-        <button type="button" class="btn-hud" id="btnOpenShare" title="Condivisione Remota, Embed LMS e Caricamento JSON">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
-          <span>Remoto / JSON</span>
-        </button>
-        <button type="button" class="btn-hud btn-hud-reset" id="btnResetSession" title="Riavvia il caso dal 100%">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
-          <span>Reset</span>
+        <button type="button" class="btn-hud btn-hud-restart" id="btnResetSession">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>
+          <span>Ricomincia Percorso</span>
         </button>
       </div>
     </div>
   </header>
 
   <main class="workspace-main" id="workspaceMain">
-    <!-- ══════════════════ BANNER CONTESTO CASO & CONTROLLI VISTA ══════════════════ -->
-    <section class="context-bar" id="boardContextBar" aria-label="Informazioni sul caso e controlli lavagna">
-      <div class="context-info">
-        <div class="context-badges" id="contextBadges"></div>
-        <h1 class="context-title" id="caseTitle">Caricamento...</h1>
-        <p class="context-subtitle" id="caseSubtitle"></p>
+    <!-- ══════════════════ HERO CONTESTUALE DEL CASO CLINICO ══════════════════ -->
+    <section class="case-hero" id="caseHero" aria-label="Intestazione Caso Clinico">
+      <div class="hero-radar-rings" aria-hidden="true">
+        <span class="ring r1"></span>
+        <span class="ring r2"></span>
+        <span class="ring r3"></span>
+      </div>
+      <div class="hero-radar-sweep" aria-hidden="true"></div>
+
+      <div class="case-hero-content">
+        <div class="case-hero-badges" id="contextBadges"></div>
+        <h1 class="case-hero-title" id="caseTitle">Caricamento caso clinico...</h1>
+        <p class="case-hero-subtitle" id="caseSubtitle"></p>
       </div>
 
-      <div class="board-controls">
-        <div class="view-mode-group" role="group" aria-label="Modalità visualizzazione piramide">
-          <button type="button" class="btn-view active" id="btnModeFull" data-view-mode="full">Piramide Completa</button>
-          <button type="button" class="btn-view" id="btnModeFocus" data-view-mode="focus">Focus Step Attivo</button>
-        </div>
-
-        <div class="zoom-group" role="group" aria-label="Scala piramide">
-          <button type="button" class="btn-zoom" id="btnZoomOut" aria-label="Riduci zoom">−</button>
-          <button type="button" class="btn-zoom btn-zoom-fit" id="btnZoomFit" aria-label="Adatta allo schermo">Fit</button>
-          <button type="button" class="btn-zoom" id="btnZoomIn" aria-label="Aumenta zoom">+</button>
-        </div>
-      </div>
+      <div class="domain-legend-bar" id="domainLegendBar" aria-label="Ambiti decisionali della piramide"></div>
     </section>
 
-    <!-- Legenda Domini Decisionali -->
-    <section class="domain-legend-bar" id="domainLegendBar" aria-label="Legenda categorie decisionali"></section>
-
-    <!-- ══════════════════ AREA SLOT IN ATTESA ══════════════════ -->
-    <section class="pending-slot-view" id="pendingSlotView" hidden></section>
-
-    <!-- ══════════════════ LAVAGNA PIRAMIDE INVERSA DISCENDENTE ══════════════════ -->
-    <section class="pyramid-viewport" id="pyramidViewport" aria-label="Lavagna interattiva a Piramide Inversa">
+    <!-- ══════════════════ LAVAGNA PIRAMIDE INVERSA STEP-BY-STEP ══════════════════ -->
+    <section class="pyramid-viewport" id="pyramidViewport" aria-label="Percorso decisionale a Piramide Inversa">
       <div class="pyramid-stage" id="pyramidStage">
         <div class="pyramid-cone-guide" aria-hidden="true"></div>
         <svg class="pyramid-connectors-svg" id="pyramidConnectors" aria-hidden="true"></svg>
@@ -120,7 +99,7 @@
       </div>
     </section>
 
-    <!-- ══════════════════ DEBRIEFING FINALE & REPORT QUALITÀ ══════════════════ -->
+    <!-- ══════════════════ DEBRIEFING FINALE ══════════════════ -->
     <section class="debriefing-section" id="finalDebriefingSection" hidden aria-label="Report finale e debriefing clinico"></section>
   </main>
 
@@ -148,15 +127,15 @@
     </div>
   </dialog>
 
-  <!-- ══════════════════ DIALOG 2: CARTELLA & NARRAZIONE EVOLUTIVA ══════════════════ -->
+  <!-- ══════════════════ DIALOG 2: DIARIO CLINICO & NARRAZIONE EVOLUTIVA ══════════════════ -->
   <dialog id="patientTimelineDialog" class="radar-dialog dialog-drawer" closedby="any" aria-labelledby="timelineDialogTitle">
     <div class="dialog-shell">
       <header class="dialog-header">
         <div>
-          <span class="dialog-domain-pill">Cronistoria Clinica</span>
-          <h1 class="dialog-title-sm" id="timelineDialogTitle">Cartella &amp; Narrazione Evolutiva Paziente</h1>
+          <span class="dialog-domain-pill">Diario Clinico Progressivo</span>
+          <h1 class="dialog-title-sm" id="timelineDialogTitle">Evoluzione Clinica e Decisioni di Matteo</h1>
         </div>
-        <button type="button" class="dialog-close-btn" id="btnCloseTimelineDialog" aria-label="Chiudi cartella evolutiva">
+        <button type="button" class="dialog-close-btn" id="btnCloseTimelineDialog" aria-label="Chiudi diario clinico">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
       </header>
@@ -164,48 +143,27 @@
     </div>
   </dialog>
 
-  <!-- ══════════════════ DIALOG 3: CONDIVISIONE REMOTA, EMBED LMS & TEST JSON ══════════════════ -->
-  <dialog id="shareEmbedDialog" class="radar-dialog dialog-utility" closedby="any" aria-labelledby="shareDialogTitle">
+  <!-- ══════════════════ DIALOG 3: CONFERMA RIAVVIO PERCORSO ══════════════════ -->
+  <dialog id="resetConfirmDialog" class="radar-dialog dialog-confirm" closedby="any" aria-labelledby="resetDialogTitle">
     <div class="dialog-shell">
       <header class="dialog-header">
         <div>
-          <span class="dialog-domain-pill">Distribuzione Remota &amp; Authoring</span>
-          <h1 class="dialog-title-sm" id="shareDialogTitle">Accesso Remoto, Embed LMS &amp; Caricamento Casi JSON</h1>
+          <span class="dialog-domain-pill">Nuovo Tentativo</span>
+          <h1 class="dialog-title-sm" id="resetDialogTitle">Vuoi ricominciare il percorso clinico?</h1>
         </div>
-        <button type="button" class="dialog-close-btn" id="btnCloseShareDialog" aria-label="Chiudi pannello remoto">
+        <button type="button" class="dialog-close-btn" id="btnCloseResetDialog" aria-label="Chiudi finestra di conferma">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
       </header>
-
-      <div class="dialog-body share-body">
-        <div class="share-block">
-          <h2>1. Link Diretto &amp; Codice Iframe per Piattaforma LMS FAD</h2>
-          <p class="share-desc">Usa il parametro <code>?embed=1</code> per erogare la piramide direttamente all'interno della piattaforma e-learning senza ingombri esterni.</p>
-          <label class="field-label" for="shareDirectUrl">Link Diretto Caso Corrente</label>
-          <div class="copy-row">
-            <input type="text" id="shareDirectUrl" class="field-input mono" readonly>
-            <button type="button" class="btn-secondary-sm" data-copy-target="shareDirectUrl">Copia Link</button>
-          </div>
-          <label class="field-label" for="shareEmbedCode">Codice Embed Iframe (<code>?embed=1</code>)</label>
-          <div class="copy-row">
-            <input type="text" id="shareEmbedCode" class="field-input mono" readonly>
-            <button type="button" class="btn-secondary-sm" data-copy-target="shareEmbedCode">Copia Iframe</button>
-          </div>
-        </div>
-
-        <div class="share-block">
-          <h2>2. Carica / Testa un Nuovo Caso Clinico (.json)</h2>
-          <p class="share-desc">Valida e testa istantaneamente nel browser la struttura di un nuovo caso clinico multi-snodo prima dell'inserimento nel repository.</p>
-          <div class="json-actions-row">
-            <label class="btn-primary-sm file-upload-btn">
-              <input type="file" id="jsonFileInput" accept=".json,application/json" hidden>
-              Carica File .JSON
-            </label>
-            <button type="button" class="btn-secondary-sm" id="btnDownloadTemplate">Scarica Template JSON</button>
-          </div>
-          <div id="jsonUploadFeedback" class="upload-feedback" hidden></div>
-        </div>
+      <div class="dialog-body">
+        <p style="font-size:0.9rem;color:var(--text-secondary);">
+          Le scelte effettuate finora verranno azzerate: ripartirai dallo <strong>Step 1</strong> con il <strong>Coefficiente di Qualità al 100%</strong>.
+        </p>
       </div>
+      <footer class="dialog-footer">
+        <button type="button" class="btn-secondary" id="btnCancelReset" autofocus>Continua il Caso</button>
+        <button type="button" class="btn-primary" id="btnConfirmReset">Ricomincia dal 100%</button>
+      </footer>
     </div>
   </dialog>
 

@@ -778,71 +778,7 @@
     ]
   };
 
-  const NEXT_CASE_SLOT = {
-    meta: {
-      id: 'caso-successivo-slot',
-      code: 'CASO 2.03+',
-      title: 'Slot Caso Clinico Successivo — Pronto per Caricamento Faculty',
-      subtitle: 'Slot predisposto per aggiungere nuovi casi clinici multi-snodo a Piramide Inversa (o testare file .json locali)',
-      status: 'pending_case',
-      isCalibration: false,
-      authors: 'Faculty Scientifica RADAR XLH',
-      initialQualityPct: 100,
-      passThresholdPct: 75,
-      plannedStructure: [
-        'Apice (Step 0): Briefing narrativo d’ingresso + scheda anamnestica completa',
-        'Step 1 → Step 5: Progressione piramidale multi-snodo (1 → 2 → 3 → 4 → 5)',
-        'Post-it con scelte corrette (0% CQ) ed errate (-X% CQ) e feedback didattico',
-        'Debriefing Finale con Coefficiente di Qualità (CQ%) e confronto Gold Standard'
-      ]
-    }
-  };
-
-  const CASE_JSON_TEMPLATE = {
-    meta: {
-      id: 'nuovo-caso-xlh',
-      code: 'CASO 2.03',
-      title: 'Titolo Nuovo Caso Clinico XLH',
-      subtitle: 'Sottotitolo descrittivo',
-      status: 'active',
-      authors: 'Faculty RADAR XLH',
-      initialQualityPct: 100,
-      passThresholdPct: 75
-    },
-    apex: {
-      code: 'STEP 0 · APICE DELLA PIRAMIDE',
-      badge: 'Caso Clinico Interattivo',
-      title: 'Inquadramento Iniziale del Paziente',
-      briefingQuotes: ['Citazione narrativa iniziale.'],
-      clinicalParameters: [{ label: 'Paziente', value: 'Età / Sesso', flag: 'info' }],
-      sections: [{ heading: 'Anamnesi', items: ['Dettaglio clinico'] }]
-    },
-    steps: [
-      {
-        stepNumber: 1,
-        title: 'Primo Avanzamento',
-        preChoiceEvolutionByBranch: {
-          default: { headline: 'Aggiornamento Evolutivo', narrative: 'Testo pre-scelta.' }
-        },
-        snodi: [
-          {
-            snodoId: 's1-1',
-            snodoCode: '1.1',
-            domainKey: 'comunicazionale',
-            domainLabel: 'Scelta Comunicazionale',
-            valueWeight: 100,
-            tiles: [
-              { id: 'S1-COM-A', headline: 'Scelta corretta', bodyText: 'Descrizione', isCorrect: true, qualityDeltaPct: 0, valuePoints: 100, feedbackText: 'Corretto.' },
-              { id: 'S1-COM-B', headline: 'Scelta errata', bodyText: 'Descrizione', isCorrect: false, qualityDeltaPct: -15, valuePoints: 0, feedbackText: 'Errato (-15% CQ).' }
-            ]
-          }
-        ]
-      }
-    ]
-  };
-
   return {
-    CASES_REGISTRY: [CASO_202_MATTEO, NEXT_CASE_SLOT],
-    CASE_JSON_TEMPLATE
+    CASES_REGISTRY: [CASO_202_MATTEO]
   };
 });

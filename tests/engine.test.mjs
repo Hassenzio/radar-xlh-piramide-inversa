@@ -10,7 +10,13 @@ const { validateCaseSchema, createSession, getDisplayTiles } = PyramidEngine;
 const { CASES_REGISTRY } = CasesData;
 
 const caso202 = CASES_REGISTRY.find((c) => c.meta.id === 'caso-202-xlh-pregresso');
-const slotNext = CASES_REGISTRY.find((c) => c.meta.id === 'caso-successivo-slot');
+
+test('CASES_REGISTRY contains only active didactic cases (no production slots exposed)', () => {
+  assert.equal(CASES_REGISTRY.length, 1);
+  assert.equal(CASES_REGISTRY[0].meta.status, 'active');
+  const syntheticPending = { meta: { id: 'slot', title: 'Pending', status: 'pending_case' } };
+  assert.deepEqual(validateCaseSchema(syntheticPending), { valid: true, isPending: true, errors: [] });
+});
 
 test('CASO_202 passes validation with 5 steps, 1->2->3->4->5 snodi (15) and 53 decision tiles', () => {
   const res = validateCaseSchema(caso202);
@@ -29,12 +35,6 @@ test('CASO_202 passes validation with 5 steps, 1->2->3->4->5 snodi (15) and 53 d
     s.snodi.reduce((sum, sn) => sum + sn.tiles.length, 0)
   );
   assert.deepEqual(tileCountsPerStep, [2, 6, 9, 16, 20]);
-});
-
-test('NEXT_CASE_SLOT is recognized as pending slot', () => {
-  const res = validateCaseSchema(slotNext);
-  assert.equal(res.valid, true);
-  assert.equal(res.isPending, true);
 });
 
 test('getDisplayTiles deterministically varies correct answer position across snodi', () => {

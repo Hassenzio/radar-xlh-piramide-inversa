@@ -1,23 +1,23 @@
 /* ═══════════════════════════════════════════════════════════════════════
-   RADAR XLH — Piramide Inversa Multi-Snodo UI Controller
+   RADAR XLH — Piramide Inversa Didattica Step-by-Step Controller
    ═══════════════════════════════════════════════════════════════════════ */
 
 (function () {
   'use strict';
 
-  const { DOMAIN_META, getDisplayTiles, validateCaseSchema, createSession } = window.PyramidEngine;
-  const { CASES_REGISTRY, CASE_JSON_TEMPLATE } = window.RADAR_CASES_DATA;
+  const { DOMAIN_META, getDisplayTiles, createSession } = window.PyramidEngine;
+  const { CASES_REGISTRY } = window.RADAR_CASES_DATA;
 
-  const STORAGE_PREFIX = 'radar_xlh_pyramid_v2_';
+  const STORAGE_PREFIX = 'radar_xlh_pyramid_didactic_v3_';
   const RING_CIRCUMFERENCE = 2 * Math.PI * 18;
 
-  let casesCatalog = [...CASES_REGISTRY];
-  let activeCase = casesCatalog[0];
+  let activeCase = CASES_REGISTRY[0];
   let session = null;
-  let viewMode = 'full';
-  let zoomScale = 1;
   let activeDialogContext = null;
   let toastTimeoutId = null;
+  let lastUnlockedStep = 1;
+  let displayedQualityPct = 100;
+  let qualityAnimFrame = null;
 
   const dom = {};
 
@@ -26,43 +26,30 @@
     applyUrlParameters();
     setupDialogFallbacks();
     bindGlobalEvents();
-    populateCaseSelector();
-    loadCaseById(activeCase.meta.id, { restoreFromStorage: true });
+    loadActiveCase({ restoreFromStorage: true });
     observePyramidResize();
   });
 
   function cacheDom() {
-    dom.caseSelector = document.getElementById('caseSelector');
     dom.cqRingFill = document.getElementById('cqRingFill');
     dom.hudQualityValue = document.getElementById('hudQualityValue');
     dom.hudQualityDelta = document.getElementById('hudQualityDelta');
     dom.hudStepCounter = document.getElementById('hudStepCounter');
-    dom.hudSnodiCounter = document.getElementById('hudSnodiCounter');
     dom.hudStepPills = document.getElementById('hudStepPills');
+    dom.hudSnodoDot = document.getElementById('hudSnodoDot');
     dom.hudActiveSnodo = document.getElementById('hudActiveSnodo');
-    dom.hudScoreValue = document.getElementById('hudScoreValue');
-    dom.hudScoreMax = document.getElementById('hudScoreMax');
 
     dom.contextBadges = document.getElementById('contextBadges');
     dom.caseTitle = document.getElementById('caseTitle');
     dom.caseSubtitle = document.getElementById('caseSubtitle');
     dom.domainLegendBar = document.getElementById('domainLegendBar');
 
-    dom.pendingSlotView = document.getElementById('pendingSlotView');
-    dom.pyramidViewport = document.getElementById('pyramidViewport');
     dom.pyramidStage = document.getElementById('pyramidStage');
     dom.pyramidConnectors = document.getElementById('pyramidConnectors');
     dom.pyramidRows = document.getElementById('pyramidRows');
     dom.finalDebriefingSection = document.getElementById('finalDebriefingSection');
 
-    dom.btnModeFull = document.getElementById('btnModeFull');
-    dom.btnModeFocus = document.getElementById('btnModeFocus');
-    dom.btnZoomOut = document.getElementById('btnZoomOut');
-    dom.btnZoomFit = document.getElementById('btnZoomFit');
-    dom.btnZoomIn = document.getElementById('btnZoomIn');
-
     dom.btnOpenTimeline = document.getElementById('btnOpenTimeline');
-    dom.btnOpenShare = document.getElementById('btnOpenShare');
     dom.btnResetSession = document.getElementById('btnResetSession');
 
     dom.tileDecisionDialog = document.getElementById('tileDecisionDialog');
@@ -77,13 +64,10 @@
     dom.timelineDialogBody = document.getElementById('timelineDialogBody');
     dom.btnCloseTimelineDialog = document.getElementById('btnCloseTimelineDialog');
 
-    dom.shareEmbedDialog = document.getElementById('shareEmbedDialog');
-    dom.btnCloseShareDialog = document.getElementById('btnCloseShareDialog');
-    dom.shareDirectUrl = document.getElementById('shareDirectUrl');
-    dom.shareEmbedCode = document.getElementById('shareEmbedCode');
-    dom.jsonFileInput = document.getElementById('jsonFileInput');
-    dom.btnDownloadTemplate = document.getElementById('btnDownloadTemplate');
-    dom.jsonUploadFeedback = document.getElementById('jsonUploadFeedback');
+    dom.resetConfirmDialog = document.getElementById('resetConfirmDialog');
+    dom.btnCloseResetDialog = document.getElementById('btnCloseResetDialog');
+    dom.btnCancelReset = document.getElementById('btnCancelReset');
+    dom.btnConfirmReset = document.getElementById('btnConfirmReset');
 
     dom.telemetryToast = document.getElementById('telemetryToast');
   }
@@ -95,13 +79,13 @@
     }
     const requestedCaseId = params.get('case');
     if (requestedCaseId) {
-      const found = casesCatalog.find((c) => c.meta.id === requestedCaseId);
+      const found = CASES_REGISTRY.find((c) => c.meta.id === requestedCaseId);
       if (found) activeCase = found;
     }
   }
 
   function setupDialogFallbacks() {
-    const dialogs = [dom.tileDecisionDialog, dom.patientTimelineDialog, dom.shareEmbedDialog];
+    const dialogs = [dom.tileDecisionDialog, dom.patientTimelineDialog, dom.resetConfirmDialog];
     const hasClosedBy = 'closedBy' in HTMLDialogElement.prototype;
 
     dialogs.forEach((dialog) => {
@@ -130,69 +114,23 @@
   }
 
   function bindGlobalEvents() {
-    dom.caseSelector?.addEventListener('change', (e) => {
-      loadCaseById(e.target.value, { restoreFromStorage: true });
-    });
-
-    dom.btnModeFull?.addEventListener('click', () => setViewMode('full'));
-    dom.btnModeFocus?.addEventListener('click', () => setViewMode('focus'));
-
-    dom.btnZoomOut?.addEventListener('click', () => setZoom(zoomScale - 0.1));
-    dom.btnZoomIn?.addEventListener('click', () => setZoom(zoomScale + 0.1));
-    dom.btnZoomFit?.addEventListener('click', () => setZoom(1));
-
-    dom.btnResetSession?.addEventListener('click', resetCurrentCaseSession);
-
     dom.btnOpenTimeline?.addEventListener('click', openTimelineDialog);
     dom.btnCloseTimelineDialog?.addEventListener('click', () => dom.patientTimelineDialog.close());
 
-    dom.btnOpenShare?.addEventListener('click', openShareDialog);
-    dom.btnCloseShareDialog?.addEventListener('click', () => dom.shareEmbedDialog.close());
-
     dom.btnCloseDecisionDialog?.addEventListener('click', () => dom.tileDecisionDialog.close());
 
-    document.querySelectorAll('[data-copy-target]').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        const input = document.getElementById(btn.dataset.copyTarget);
-        if (!input) return;
-        navigator.clipboard?.writeText(input.value).then(() => {
-          showToast('Copiato negli appunti.', 'ok');
-        }).catch(() => {
-          input.select();
-          showToast('Selezionato negli appunti: usa Ctrl+C.', 'info');
-        });
-      });
+    dom.btnResetSession?.addEventListener('click', () => dom.resetConfirmDialog.showModal());
+    dom.btnCloseResetDialog?.addEventListener('click', () => dom.resetConfirmDialog.close());
+    dom.btnCancelReset?.addEventListener('click', () => dom.resetConfirmDialog.close());
+    dom.btnConfirmReset?.addEventListener('click', () => {
+      dom.resetConfirmDialog.close();
+      resetCurrentCaseSession();
     });
-
-    dom.jsonFileInput?.addEventListener('change', handleJsonUpload);
-    dom.btnDownloadTemplate?.addEventListener('click', downloadTemplateJson);
   }
 
-  function populateCaseSelector() {
-    if (!dom.caseSelector) return;
-    dom.caseSelector.innerHTML = casesCatalog
-      .map((c) => {
-        const prefix = c.meta.status === 'pending_case' ? '⏳ ' : '● ';
-        return `<option value="${escapeAttr(c.meta.id)}">${escapeHtml(prefix + c.meta.code + ' · ' + c.meta.title)}</option>`;
-      })
-      .join('');
-    dom.caseSelector.value = activeCase.meta.id;
-  }
-
-  function loadCaseById(caseId, options = { restoreFromStorage: true }) {
-    const found = casesCatalog.find((c) => c.meta.id === caseId) || casesCatalog[0];
-    activeCase = found;
-    if (dom.caseSelector) dom.caseSelector.value = activeCase.meta.id;
-
-    const validation = validateCaseSchema(activeCase);
-    if (validation.isPending) {
-      session = null;
-      renderPendingCaseSlot();
-      return;
-    }
-
+  function loadActiveCase({ restoreFromStorage }) {
     let saved = null;
-    if (options.restoreFromStorage) {
+    if (restoreFromStorage) {
       try {
         const raw = sessionStorage.getItem(STORAGE_PREFIX + activeCase.meta.id);
         if (raw) saved = JSON.parse(raw);
@@ -202,8 +140,11 @@
     }
 
     session = createSession(activeCase, saved);
+    const snap = session.getSnapshot();
+    lastUnlockedStep = snap.completed ? snap.totalSteps : snap.activeStep;
+    displayedQualityPct = snap.qualityPct;
     if (dom.hudQualityDelta) dom.hudQualityDelta.hidden = true;
-    renderAll();
+    renderAll({ newlyUnlockedStep: null });
   }
 
   function saveSessionSnapshot() {
@@ -214,92 +155,63 @@
   }
 
   function resetCurrentCaseSession() {
-    if (!activeCase || activeCase.meta.status === 'pending_case') return;
     try {
       sessionStorage.removeItem(STORAGE_PREFIX + activeCase.meta.id);
     } catch (e) {}
     session = createSession(activeCase);
+    lastUnlockedStep = 1;
+    displayedQualityPct = 100;
     if (dom.hudQualityDelta) dom.hudQualityDelta.hidden = true;
-    renderAll();
-    showToast('Caso riavviato: Coefficiente di Qualità ripristinato al 100%.', 'ok');
+    renderAll({ newlyUnlockedStep: 1 });
+    showToast('Percorso riavviato: Coefficiente di Qualità ripristinato al 100%.', 'ok');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  function setViewMode(mode) {
-    viewMode = mode;
-    document.body.classList.toggle('mode-focus', mode === 'focus');
-    dom.btnModeFull?.classList.toggle('active', mode === 'full');
-    dom.btnModeFocus?.classList.toggle('active', mode === 'focus');
-    if (mode === 'focus' && session && !session.getSnapshot().completed) {
-      scrollToStep(session.getSnapshot().activeStep);
-    }
-    requestAnimationFrame(drawPyramidConnectors);
-  }
-
-  function setZoom(nextScale) {
-    zoomScale = Math.min(1.2, Math.max(0.7, Math.round(nextScale * 10) / 10));
-    document.documentElement.style.setProperty('--pyramid-scale', String(zoomScale));
-    requestAnimationFrame(drawPyramidConnectors);
-  }
-
-  function renderAll() {
-    dom.pendingSlotView.hidden = true;
-    dom.pyramidViewport.hidden = false;
-    dom.domainLegendBar.hidden = false;
-
+  function renderAll({ newlyUnlockedStep = null, lastDelta = 0 } = {}) {
     renderContextHeader();
-    renderTelemetryHud();
+    renderTelemetryHud(lastDelta);
     renderDomainLegend();
-    renderPyramid();
+    renderPyramid(newlyUnlockedStep);
     renderDebriefing();
-    requestAnimationFrame(drawPyramidConnectors);
-  }
-
-  function renderPendingCaseSlot() {
-    dom.pyramidViewport.hidden = true;
-    dom.finalDebriefingSection.hidden = true;
-    dom.domainLegendBar.hidden = true;
-    dom.pendingSlotView.hidden = false;
-
-    renderContextHeader();
-    dom.hudQualityValue.textContent = '100%';
-    dom.hudStepCounter.textContent = '—';
-    dom.hudSnodiCounter.textContent = '0/0';
-    dom.hudActiveSnodo.textContent = 'In attesa contenuti';
-    dom.hudScoreValue.textContent = '0';
-    dom.hudScoreMax.textContent = '/ — pt';
-    dom.hudStepPills.innerHTML = '';
-
-    const items = (activeCase.meta.plannedStructure || [])
-      .map((line) => `<li>${formatClinicalNoBreak(escapeHtml(line))}</li>`)
-      .join('');
-
-    dom.pendingSlotView.innerHTML = `
-      <span class="badge-case-code">${escapeHtml(activeCase.meta.code)}</span>
-      <h2>${formatClinicalNoBreak(escapeHtml(activeCase.meta.title))}</h2>
-      <p>${formatClinicalNoBreak(escapeHtml(activeCase.meta.subtitle))}</p>
-      <ul class="pending-checklist">${items}</ul>
-      <div class="pending-actions">
-        <button type="button" class="btn-primary" id="btnBackToMainCase">Torna al Caso Clinico 2.02 (Matteo, 26 anni)</button>
-        <button type="button" class="btn-secondary" id="btnOpenJsonSlot">Carica / Testa File JSON</button>
-      </div>
-    `;
-
-    document.getElementById('btnBackToMainCase')?.addEventListener('click', () => {
-      loadCaseById('caso-202-xlh-pregresso', { restoreFromStorage: true });
-    });
-    document.getElementById('btnOpenJsonSlot')?.addEventListener('click', openShareDialog);
+    requestAnimationFrame(() => drawPyramidConnectors(Boolean(newlyUnlockedStep)));
   }
 
   function renderContextHeader() {
     const meta = activeCase.meta;
-    const badges = [`<span class="badge-case-code">${escapeHtml(meta.code)}</span>`];
-    if (meta.status === 'active') {
-      badges.push('<span class="badge-case-live">Caso Clinico Interattivo Attivo</span>');
-    }
-    dom.contextBadges.innerHTML = badges.join('');
+    dom.contextBadges.innerHTML = `
+      <span class="badge-case-code">${escapeHtml(meta.code)}</span>
+      <span class="badge-case-live">Percorso Clinico Interattivo</span>
+    `;
     dom.caseTitle.innerHTML = formatClinicalNoBreak(escapeHtml(meta.title));
     dom.caseSubtitle.innerHTML = formatClinicalNoBreak(escapeHtml(meta.subtitle));
+  }
+
+  function animateQualityCounter(targetPct) {
+    cancelAnimationFrame(qualityAnimFrame);
+    const prefersReduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReduced || displayedQualityPct === targetPct) {
+      displayedQualityPct = targetPct;
+      dom.hudQualityValue.textContent = `${targetPct}%`;
+      return;
+    }
+
+    const startVal = displayedQualityPct;
+    const startTime = performance.now();
+    const duration = 380;
+
+    function tick(now) {
+      const progress = Math.min(1, (now - startTime) / duration);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      const current = Math.round(startVal + (targetPct - startVal) * eased);
+      displayedQualityPct = current;
+      dom.hudQualityValue.textContent = `${current}%`;
+      if (progress < 1) {
+        qualityAnimFrame = requestAnimationFrame(tick);
+      } else {
+        displayedQualityPct = targetPct;
+      }
+    }
+    qualityAnimFrame = requestAnimationFrame(tick);
   }
 
   function renderTelemetryHud(lastDelta = 0) {
@@ -307,7 +219,8 @@
     const snap = session.getSnapshot();
     const band = snap.qualityBand;
 
-    dom.hudQualityValue.textContent = `${snap.qualityPct}%`;
+    animateQualityCounter(snap.qualityPct);
+
     const offset = RING_CIRCUMFERENCE * (1 - snap.qualityPct / 100);
     if (dom.cqRingFill) {
       dom.cqRingFill.style.strokeDashoffset = String(offset);
@@ -316,7 +229,7 @@
 
     if (dom.hudQualityDelta) {
       if (lastDelta < 0) {
-        dom.hudQualityDelta.textContent = `${lastDelta}% CQ`;
+        dom.hudQualityDelta.textContent = `${lastDelta}%`;
         dom.hudQualityDelta.hidden = false;
       } else if (snap.qualityPct === 100) {
         dom.hudQualityDelta.hidden = true;
@@ -325,13 +238,15 @@
 
     const displayStep = snap.completed ? snap.totalSteps : snap.activeStep;
     dom.hudStepCounter.textContent = `${displayStep} di ${snap.totalSteps}`;
-    dom.hudSnodiCounter.textContent = `${snap.resolvedSnodiCount}/${snap.totalSnodiCount} snodi`;
-    dom.hudActiveSnodo.textContent = snap.completed
-      ? 'Completato (Debriefing)'
-      : `${snap.activeSnodo?.snodoCode || ''} · ${snap.activeSnodo?.domainLabel || ''}`;
 
-    dom.hudScoreValue.textContent = String(snap.valueScore);
-    dom.hudScoreMax.textContent = `/ ${snap.maxPossibleScore} pt`;
+    const activeSnodo = snap.activeSnodo;
+    const domainColor = activeSnodo ? DOMAIN_META[activeSnodo.domainKey]?.accentColor : '#10B981';
+    if (dom.hudSnodoDot) {
+      dom.hudSnodoDot.style.backgroundColor = snap.completed ? '#10B981' : (domainColor || '#3BA5DB');
+    }
+    dom.hudActiveSnodo.textContent = snap.completed
+      ? 'Percorso Completato (Debriefing)'
+      : `${activeSnodo?.snodoCode || ''} · ${activeSnodo?.domainLabel || ''}`;
 
     dom.hudStepPills.innerHTML = activeCase.steps.map((st) => {
       const status = session.getStepStatus(st.stepNumber);
@@ -360,7 +275,7 @@
     }).join('');
   }
 
-  function renderPyramid() {
+  function renderPyramid(newlyUnlockedStep) {
     if (!session) return;
     const snap = session.getSnapshot();
     const apex = activeCase.apex;
@@ -398,60 +313,48 @@
       </div>
     `;
 
-    const stepsHtml = activeCase.steps.map((step) => {
+    // SVELAMENTO PROGRESSIVO STEP-BY-STEP: mostra solo gli step <= activeStep (o tutti se completato)
+    const maxVisibleStep = snap.completed ? snap.totalSteps : snap.activeStep;
+    const visibleSteps = activeCase.steps.filter((s) => s.stepNumber <= maxVisibleStep);
+
+    const stepsHtml = visibleSteps.map((step) => {
       const stepStatus = session.getStepStatus(step.stepNumber);
       const evolution = session.getStepPreChoiceEvolution(step.stepNumber);
       const snodiCount = step.snodi.length;
       const postitsTotal = step.snodi.reduce((sum, sn) => sum + sn.tiles.length, 0);
       const resolvedInStep = step.snodi.filter((sn) => Boolean(snap.resolvedSnodi[sn.snodoId])).length;
+      const isNewStep = newlyUnlockedStep === step.stepNumber;
 
       const stateBadgeText = stepStatus === 'resolved'
         ? `Step Completato (${snodiCount}/${snodiCount})`
-        : (stepStatus === 'active'
-          ? `Step Attivo · ${resolvedInStep}/${snodiCount} snodi risolti`
-          : `Bloccato · ${snodiCount} snodi (${postitsTotal} Post-it)`);
+        : `Step Attivo · ${resolvedInStep}/${snodiCount} snodi completati`;
 
-      let evolutionHtml = '';
-      if ((stepStatus === 'active' || stepStatus === 'resolved') && evolution) {
-        evolutionHtml = `
-          <div class="evolution-briefing-card" id="evolutionCardStep${step.stepNumber}">
-            <div class="evolution-kicker">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-              <span>Step ${step.stepNumber} di ${activeCase.steps.length} · Prima della Scelta</span>
-            </div>
-            <h3 class="evolution-headline">${formatClinicalNoBreak(escapeHtml(evolution.headline))}</h3>
-            <p class="evolution-narrative">${formatClinicalNoBreak(escapeHtml(evolution.narrative))}</p>
+      const evolutionHtml = evolution ? `
+        <div class="evolution-briefing-card" id="evolutionCardStep${step.stepNumber}">
+          <div class="evolution-kicker">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <span>Step ${step.stepNumber} di ${activeCase.steps.length} · Prima della Scelta</span>
           </div>
-        `;
-      }
+          <h3 class="evolution-headline">${formatClinicalNoBreak(escapeHtml(evolution.headline))}</h3>
+          <p class="evolution-narrative">${formatClinicalNoBreak(escapeHtml(evolution.narrative))}</p>
+        </div>
+      ` : '';
 
-      const snodiHtml = step.snodi.map((snodo) => {
+      const snodiHtml = step.snodi.map((snodo, sIdx) => {
         const domainMeta = DOMAIN_META[snodo.domainKey] || { accentColor: '#0E8AC8' };
         const resolved = snap.resolvedSnodi[snodo.snodoId];
         const isSnodoResolved = Boolean(resolved);
-        const snodoStateCls = stepStatus === 'locked'
-          ? 'is-locked'
-          : (isSnodoResolved ? 'is-resolved' : 'is-active');
+        const snodoStateCls = isSnodoResolved ? 'is-resolved' : 'is-active';
 
-        let statusBadge = 'In attesa';
-        let statusCls = '';
-        if (stepStatus === 'active' && !isSnodoResolved) {
-          statusBadge = 'Scegli 1 Post-it';
-          statusCls = 'status-active';
-        } else if (isSnodoResolved) {
+        let statusBadge = 'Scegli 1 Post-it';
+        let statusCls = 'status-active';
+        if (isSnodoResolved) {
           statusBadge = resolved.isCorrect ? 'Corretto · 0% CQ' : `Errato · ${resolved.qualityDeltaPct}% CQ`;
           statusCls = resolved.isCorrect ? 'status-ok' : 'status-err';
         }
 
         let tilesBodyHtml = '';
-        if (stepStatus === 'locked') {
-          const minis = snodo.tiles.map((_, idx) => `
-            <div class="postit-tile is-locked-mini" aria-disabled="true">
-              <span>Post-it #${idx + 1}</span>
-            </div>
-          `).join('');
-          tilesBodyHtml = `<div class="snodo-locked-grid">${minis}</div>`;
-        } else if (isSnodoResolved) {
+        if (isSnodoResolved) {
           const chosenCls = resolved.isCorrect ? 'is-chosen-correct' : 'is-chosen-error';
           const pillCls = resolved.isCorrect ? 'pill-optimal' : 'pill-error';
           const deltaLabel = resolved.qualityDeltaPct < 0 ? `${resolved.qualityDeltaPct}% CQ` : '0% CQ';
@@ -460,6 +363,7 @@
               <button
                 type="button"
                 class="postit-tile is-chosen ${chosenCls}"
+                data-domain="${escapeAttr(snodo.domainKey)}"
                 data-snodo-id="${escapeAttr(snodo.snodoId)}"
                 data-tile-id="${escapeAttr(resolved.tileId)}"
                 data-resolved-inspect="1"
@@ -470,7 +374,6 @@
                 </div>
                 <div class="postit-title">${formatClinicalNoBreak(escapeHtml(resolved.headline))}</div>
                 <div class="postit-footer">
-                  <span style="color:var(--navy-deep);">+${resolved.valuePoints} pt</span>
                   <span class="postit-cta">Rivedi Feedback</span>
                 </div>
               </button>
@@ -481,17 +384,18 @@
           `;
         } else {
           const displayTiles = getDisplayTiles(snodo);
-          const buttons = displayTiles.map((tile, idx) => `
+          const buttons = displayTiles.map((tile, tIdx) => `
             <button
               type="button"
               class="postit-tile is-active"
+              style="--tile-idx:${tIdx};"
+              data-domain="${escapeAttr(snodo.domainKey)}"
               data-snodo-id="${escapeAttr(snodo.snodoId)}"
               data-tile-id="${escapeAttr(tile.id)}"
-              aria-label="${escapeAttr(`Snodo ${snodo.snodoCode} Post-it ${idx + 1}: ${tile.headline}`)}"
+              aria-label="${escapeAttr(`Snodo ${snodo.snodoCode} Opzione ${tIdx + 1}: ${tile.headline}`)}"
             >
               <div class="postit-top">
-                <span class="postit-code">Post-it #${idx + 1}</span>
-                <span class="mono" style="font-size:0.65rem;color:var(--text-muted);">${snodo.valueWeight} pt</span>
+                <span class="postit-code">Opzione ${tIdx + 1}</span>
               </div>
               <div class="postit-title">${formatClinicalNoBreak(escapeHtml(tile.headline))}</div>
               <div class="postit-footer">
@@ -507,7 +411,7 @@
             class="snodo-board ${snodoStateCls}"
             id="snodoBoard_${escapeAttr(snodo.snodoId)}"
             data-snodo-id="${escapeAttr(snodo.snodoId)}"
-            style="--snodo-accent:${domainMeta.accentColor};"
+            style="--snodo-accent:${domainMeta.accentColor}; --snodo-idx:${sIdx};"
           >
             <header class="snodo-board-head">
               <div class="snodo-head-row">
@@ -523,7 +427,7 @@
 
       return `
         <section
-          class="pyramid-step-band is-${stepStatus}"
+          class="pyramid-step-band is-${stepStatus} ${isNewStep ? 'is-newly-unlocked' : ''}"
           id="stepBand${step.stepNumber}"
           data-step-band="${step.stepNumber}"
         >
@@ -541,14 +445,24 @@
       `;
     }).join('');
 
-    dom.pyramidRows.innerHTML = apexHtml + stepsHtml;
+    let teaserHtml = '';
+    if (!snap.completed && snap.activeStep < snap.totalSteps) {
+      const nextStepCfg = activeCase.steps[snap.activeStep];
+      const nextSnodiCount = nextStepCfg.snodi.length;
+      const nextTilesCount = nextStepCfg.snodi.reduce((sum, sn) => sum + sn.tiles.length, 0);
+      teaserHtml = `
+        <div class="next-step-teaser" id="nextStepTeaser">
+          <span class="teaser-pulse-dot" aria-hidden="true"></span>
+          <span>Completa lo Step 0${snap.activeStep} per svelare lo <strong>Step 0${nextStepCfg.stepNumber}</strong> (${nextSnodiCount} snodi · ${nextTilesCount} Post-it)</span>
+        </div>
+      `;
+    }
+
+    dom.pyramidRows.innerHTML = apexHtml + stepsHtml + teaserHtml;
 
     dom.pyramidRows.querySelectorAll('.postit-tile[data-tile-id]').forEach((btn) => {
       btn.addEventListener('click', () => {
-        const snodoId = btn.dataset.snodoId;
-        const tileId = btn.dataset.tileId;
-        const isInspect = btn.dataset.resolvedInspect === '1';
-        openTileDialog(snodoId, tileId, isInspect);
+        openTileDialog(btn.dataset.snodoId, btn.dataset.tileId, btn.dataset.resolvedInspect === '1');
       });
     });
   }
@@ -574,7 +488,7 @@
 
     dom.decisionDomainPill.textContent = `Step ${step.stepNumber} · Snodo ${snodo.snodoCode} · ${snodo.domainLabel}`;
     dom.decisionDomainPill.style.color = domainMeta?.accentColor || 'var(--blue-radar)';
-    dom.decisionCodePill.textContent = isInspect ? tile.id : `Post-it · Snodo ${snodo.snodoCode}`;
+    dom.decisionCodePill.textContent = isInspect ? tile.id : `Snodo ${snodo.snodoCode}`;
     dom.decisionDialogTitle.innerHTML = formatClinicalNoBreak(escapeHtml(tile.headline));
 
     if (isInspect) {
@@ -589,8 +503,7 @@
       const snap = session.getSnapshot();
       dom.decisionDynamicContent.innerHTML = `
         <div class="decision-stakes-bar">
-          <span><strong>Coeff. Qualità attuale:</strong> <span class="mono">${snap.qualityPct}%</span></span>
-          <span><strong>Valore snodo:</strong> <span class="mono">${snodo.valueWeight} pt</span></span>
+          <span><strong>Coefficiente Qualità attuale:</strong> <span class="mono">${snap.qualityPct}%</span></span>
           <span><strong>Categoria:</strong> ${formatClinicalNoBreak(escapeHtml(snodo.domainLabel))}</span>
         </div>
         <div class="decision-box">
@@ -619,16 +532,27 @@
     const result = session.selectTile(snodoId, tileId);
 
     saveSessionSnapshot();
-    renderTelemetryHud(result.record.qualityDeltaPct);
-    renderDomainLegend();
-    renderPyramid();
-    renderDebriefing();
-    requestAnimationFrame(drawPyramidConnectors);
+
+    const snap = result.snapshot;
+    const unlockedNow = result.stepAdvanced && snap.activeStep > lastUnlockedStep
+      ? snap.activeStep
+      : null;
+    if (unlockedNow) lastUnlockedStep = unlockedNow;
+
+    const updateView = () => {
+      renderAll({ newlyUnlockedStep: unlockedNow, lastDelta: result.record.qualityDeltaPct });
+    };
+
+    if (typeof document.startViewTransition === 'function' && !window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) {
+      document.startViewTransition(updateView);
+    } else {
+      updateView();
+    }
 
     if (result.record.qualityDeltaPct < 0) {
       showToast(`Scelta errata (${result.record.tileId}): ${result.record.qualityDeltaPct}% CQ (ora ${result.record.qualityAfter}%).`, 'error');
     } else {
-      showToast(`Scelta corretta (${result.record.tileId}): +${result.record.valuePoints} pt · CQ ${result.record.qualityAfter}%.`, 'ok');
+      showToast(`Scelta corretta (${result.record.tileId}): CQ mantenuto al ${result.record.qualityAfter}%.`, 'ok');
     }
 
     dom.decisionCodePill.textContent = result.record.tileId;
@@ -647,8 +571,7 @@
       <div class="feedback-banner ${isCorrect ? 'outcome-optimal' : 'outcome-error'}">
         <strong>${isCorrect ? 'Scelta Corretta' : 'Scelta Errata'} — ${escapeHtml(rec.tileId || tileOrRecord.id)}</strong>
         <div class="feedback-metrics-row">
-          <span class="feedback-metric-chip">Qualità: ${deltaText}</span>
-          <span class="feedback-metric-chip">Valore acquisito: +${rec.valuePoints} pt</span>
+          <span class="feedback-metric-chip">Coefficiente Qualità: ${deltaText}</span>
         </div>
       </div>
 
@@ -674,8 +597,8 @@
     }
 
     let nextBtnLabel = 'Prosegui nello Step Corrente';
-    if (outcome.completed) nextBtnLabel = 'Visualizza Debriefing Finale';
-    else if (outcome.stepAdvanced) nextBtnLabel = `Procedi allo Step 0${outcome.nextStepNumber} ↓`;
+    if (outcome.completed) nextBtnLabel = 'Visualizza Sintesi & Debriefing Finale';
+    else if (outcome.stepAdvanced) nextBtnLabel = `Svela Step 0${outcome.nextStepNumber} ↓`;
 
     dom.decisionDialogFooter.innerHTML = `
       <button type="button" class="btn-primary" id="btnFeedbackProceed" autofocus>${nextBtnLabel}</button>
@@ -728,8 +651,8 @@
           <h2 class="debrief-title">${escapeHtml(report.qualityBand.label)} (CQ Finale: ${report.finalQualityPct}%)</h2>
           <p class="debrief-verdict-sub">
             ${report.passedThreshold
-              ? `Soglia qualitativa (${report.passThresholdPct}%) superata su tutti i ${report.totalSnodiCount} snodi della piramide.`
-              : `Coefficiente di Qualità inferiore alla soglia (${report.passThresholdPct}%): esamina gli snodi critici nella tabella e ripeti il caso.`}
+              ? `Soglia qualitativa (${report.passThresholdPct}%) superata lungo tutti i ${report.totalSnodiCount} snodi della piramide.`
+              : `Coefficiente di Qualità inferiore alla soglia (${report.passThresholdPct}%): analizza gli snodi critici nella tabella e ripeti il percorso.`}
           </p>
         </div>
         <span class="postit-outcome-pill ${report.passedThreshold ? 'pill-optimal' : 'pill-error'}" style="font-size:0.84rem;padding:6px 14px;">
@@ -741,10 +664,6 @@
         <div class="debrief-kpi-card">
           <div class="debrief-kpi-label">CQ Finale</div>
           <div class="debrief-kpi-val" style="color:${report.qualityBand.color}">${report.finalQualityPct}%</div>
-        </div>
-        <div class="debrief-kpi-card">
-          <div class="debrief-kpi-label">Valore Decisionale</div>
-          <div class="debrief-kpi-val">${report.totalValueScore} / ${report.maxPossibleScore} pt</div>
         </div>
         <div class="debrief-kpi-card">
           <div class="debrief-kpi-label">Snodi Corretti</div>
@@ -773,13 +692,13 @@
       </div>
 
       <div class="debrief-actions">
-        <button type="button" class="btn-primary" id="btnDebriefReset">Ripeti Caso (Reset al 100%)</button>
+        <button type="button" class="btn-primary" id="btnDebriefReset">Ricomincia Percorso</button>
         <button type="button" class="btn-secondary" id="btnDebriefPrint">Stampa / Salva Report PDF</button>
-        <button type="button" class="btn-secondary" id="btnDebriefTop">Rivedi Piramide Inversa ↑</button>
+        <button type="button" class="btn-secondary" id="btnDebriefTop">Torna all’Apice ↑</button>
       </div>
     `;
 
-    document.getElementById('btnDebriefReset')?.addEventListener('click', resetCurrentCaseSession);
+    document.getElementById('btnDebriefReset')?.addEventListener('click', () => dom.resetConfirmDialog.showModal());
     document.getElementById('btnDebriefPrint')?.addEventListener('click', () => window.print());
     document.getElementById('btnDebriefTop')?.addEventListener('click', () => {
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -799,12 +718,11 @@
     ];
 
     activeCase.steps.forEach((step) => {
-      const status = session.getStepStatus(step.stepNumber);
-      if (status === 'locked') return;
+      if (!snap.completed && step.stepNumber > snap.activeStep) return;
       const evo = session.getStepPreChoiceEvolution(step.stepNumber);
       const snodiLines = step.snodi.map((sn) => {
         const rec = snap.resolvedSnodi[sn.snodoId];
-        if (!rec) return `<li><strong>Snodo ${escapeHtml(sn.snodoCode)}:</strong> in attesa di scelta</li>`;
+        if (!rec) return `<li><strong>Snodo ${escapeHtml(sn.snodoCode)}:</strong> in attesa di decisione</li>`;
         return `<li><strong>Snodo ${escapeHtml(sn.snodoCode)} (${escapeHtml(rec.tileId)}):</strong> ${formatClinicalNoBreak(escapeHtml(rec.headline))} · <span class="mono">${rec.qualityDeltaPct < 0 ? `${rec.qualityDeltaPct}% CQ` : '0% CQ'}</span></li>`;
       }).join('');
 
@@ -823,81 +741,15 @@
     dom.patientTimelineDialog.showModal();
   }
 
-  function openShareDialog() {
-    const baseUrl = `${window.location.origin}${window.location.pathname}`;
-    const caseParam = `?case=${encodeURIComponent(activeCase.meta.id)}`;
-    const directUrl = baseUrl.startsWith('null') || window.location.protocol === 'file:'
-      ? `${window.location.href.split('?')[0]}${caseParam}`
-      : `${baseUrl}${caseParam}`;
-    const embedUrl = `${directUrl}&embed=1`;
-
-    if (dom.shareDirectUrl) dom.shareDirectUrl.value = directUrl;
-    if (dom.shareEmbedCode) {
-      dom.shareEmbedCode.value = `<iframe src="${embedUrl}" title="RADAR XLH — Piramide Inversa" style="width:100%;height:860px;border:0;border-radius:12px;" allow="fullscreen" loading="lazy"></iframe>`;
-    }
-    if (dom.jsonUploadFeedback) dom.jsonUploadFeedback.hidden = true;
-    dom.shareEmbedDialog.showModal();
-  }
-
-  function handleJsonUpload(event) {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = () => {
-      try {
-        const parsed = JSON.parse(String(reader.result));
-        const check = validateCaseSchema(parsed);
-        if (!check.valid) {
-          dom.jsonUploadFeedback.className = 'upload-feedback err';
-          dom.jsonUploadFeedback.textContent = `Schema JSON non valido: ${check.errors.slice(0, 3).join(' · ')}`;
-          dom.jsonUploadFeedback.hidden = false;
-          return;
-        }
-
-        const existingIdx = casesCatalog.findIndex((c) => c.meta.id === parsed.meta.id);
-        if (existingIdx >= 0) casesCatalog[existingIdx] = parsed;
-        else casesCatalog.push(parsed);
-
-        populateCaseSelector();
-        loadCaseById(parsed.meta.id, { restoreFromStorage: false });
-
-        dom.jsonUploadFeedback.className = 'upload-feedback ok';
-        dom.jsonUploadFeedback.textContent = `Caso "${parsed.meta.title}" validato (${check.summary?.snodiCount || 0} snodi, ${check.summary?.totalDecisionTiles || 0} Post-it).`;
-        dom.jsonUploadFeedback.hidden = false;
-        showToast(`Caso "${parsed.meta.code}" caricato nella piramide!`, 'ok');
-      } catch (err) {
-        dom.jsonUploadFeedback.className = 'upload-feedback err';
-        dom.jsonUploadFeedback.textContent = `Errore parsing JSON: ${err.message}`;
-        dom.jsonUploadFeedback.hidden = false;
-      } finally {
-        event.target.value = '';
-      }
-    };
-    reader.readAsText(file, 'utf-8');
-  }
-
-  function downloadTemplateJson() {
-    const blob = new Blob([JSON.stringify(CASE_JSON_TEMPLATE, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'radar-xlh-caso-template.json';
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
-  }
-
   /* ══════════════════ CONNETTORI SVG DINAMICI PIRAMIDE ══════════════════ */
   function observePyramidResize() {
     if (typeof ResizeObserver === 'undefined' || !dom.pyramidRows) return;
-    const ro = new ResizeObserver(() => requestAnimationFrame(drawPyramidConnectors));
+    const ro = new ResizeObserver(() => requestAnimationFrame(() => drawPyramidConnectors(false)));
     ro.observe(dom.pyramidRows);
-    window.addEventListener('resize', () => requestAnimationFrame(drawPyramidConnectors), { passive: true });
+    window.addEventListener('resize', () => requestAnimationFrame(() => drawPyramidConnectors(false)), { passive: true });
   }
 
-  function drawPyramidConnectors() {
+  function drawPyramidConnectors(animateNew) {
     const svg = dom.pyramidConnectors;
     const stage = dom.pyramidStage;
     if (!svg || !stage || !session) return;
@@ -905,16 +757,18 @@
     const stageRect = stage.getBoundingClientRect();
     if (stageRect.width === 0 || stageRect.height === 0) return;
 
-    const scale = zoomScale || 1;
     svg.setAttribute('viewBox', `0 0 ${stage.offsetWidth} ${stage.offsetHeight}`);
 
+    const snap = session.getSnapshot();
+    const maxVisibleStep = snap.completed ? snap.totalSteps : snap.activeStep;
     const paths = [];
+
     const relBox = (el) => {
       const r = el.getBoundingClientRect();
       return {
-        cx: (r.left - stageRect.left + r.width / 2) / scale,
-        top: (r.top - stageRect.top) / scale,
-        bottom: (r.bottom - stageRect.top) / scale
+        cx: r.left - stageRect.left + r.width / 2,
+        top: r.top - stageRect.top,
+        bottom: r.bottom - stageRect.top
       };
     };
 
@@ -926,15 +780,15 @@
       paths.push(makeCurve(a.cx, a.bottom, b.cx, b.top, 'is-active-trail'));
     }
 
-    for (let i = 0; i < activeCase.steps.length - 1; i += 1) {
+    for (let i = 0; i < maxVisibleStep - 1; i += 1) {
       const curStep = activeCase.steps[i];
       const nextStep = activeCase.steps[i + 1];
-      const curStatus = session.getStepStatus(curStep.stepNumber);
       const sourceContainer = document.querySelector(`#stepBand${curStep.stepNumber} .step-snodi-grid`);
       if (!sourceContainer) continue;
 
       const s = relBox(sourceContainer);
-      const cls = curStatus === 'resolved' ? 'is-active-trail' : '';
+      const isNewestBand = animateNew && nextStep.stepNumber === snap.activeStep;
+      const cls = isNewestBand ? 'is-active-trail is-new-connector' : 'is-active-trail';
 
       nextStep.snodi.forEach((nextSnodo) => {
         const targetBoard = document.getElementById(`snodoBoard_${nextSnodo.snodoId}`);
@@ -954,9 +808,9 @@
   }
 
   function scrollToStep(stepNumber) {
-    const target = document.getElementById(`evolutionCardStep${stepNumber}`) || document.getElementById(`stepBand${stepNumber}`);
+    const target = document.getElementById(`stepBand${stepNumber}`) || document.getElementById(`evolutionCardStep${stepNumber}`);
     if (target) {
-      const y = target.getBoundingClientRect().top + window.scrollY - 90;
+      const y = target.getBoundingClientRect().top + window.scrollY - 82;
       window.scrollTo({ top: Math.max(0, y), behavior: 'smooth' });
     }
   }
@@ -969,7 +823,7 @@
     dom.telemetryToast.hidden = false;
     toastTimeoutId = setTimeout(() => {
       dom.telemetryToast.hidden = true;
-    }, 3800);
+    }, 3600);
   }
 
   function formatClinicalNoBreak(str) {
