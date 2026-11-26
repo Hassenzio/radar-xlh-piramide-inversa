@@ -8,9 +8,11 @@
   const { DOMAIN_META, getDisplayTiles, createSession } = window.PyramidEngine;
   const { CASES_REGISTRY } = window.RADAR_CASES_DATA;
 
+  const DEFAULT_RETURN_URL = 'https://hassenzio.github.io/radar-xlh-faculty-review/?module=2&unit=02:02:00#stageViewer';
   const STORAGE_PREFIX = 'radar_xlh_pyramid_didactic_v3_';
   const RING_CIRCUMFERENCE = 2 * Math.PI * 18;
 
+  let returnPlatformUrl = DEFAULT_RETURN_URL;
   let currentScreen = 'launcher'; // 'launcher' | 'case'
   let activeCase = CASES_REGISTRY[0];
   let session = null;
@@ -59,6 +61,7 @@
     dom.finalDebriefingSection = document.getElementById('finalDebriefingSection');
 
     dom.btnSwitchCase = document.getElementById('btnSwitchCase');
+    dom.btnReturnPlatform = document.getElementById('btnReturnPlatform');
     dom.btnOpenTimeline = document.getElementById('btnOpenTimeline');
     dom.btnResetSession = document.getElementById('btnResetSession');
 
@@ -83,10 +86,30 @@
     dom.telemetryToast = document.getElementById('telemetryToast');
   }
 
+  function isAllowedReturnUrl(candidate) {
+    try {
+      const parsed = new URL(candidate);
+      if (parsed.href.startsWith('https://hassenzio.github.io/radar-xlh-faculty-review/')) return true;
+      if ((parsed.hostname === '127.0.0.1' || parsed.hostname === 'localhost') && (parsed.protocol === 'http:' || parsed.protocol === 'https:')) {
+        return true;
+      }
+      return false;
+    } catch (e) {
+      return false;
+    }
+  }
+
   function applyUrlParameters() {
     const params = new URLSearchParams(window.location.search);
     if (params.get('embed') === '1') {
       document.body.classList.add('is-embed');
+    }
+    const rawReturn = params.get('returnTo');
+    if (rawReturn && isAllowedReturnUrl(rawReturn)) {
+      returnPlatformUrl = rawReturn;
+    }
+    if (dom.btnReturnPlatform) {
+      dom.btnReturnPlatform.href = returnPlatformUrl;
     }
     const requestedCaseId = params.get('case');
     if (requestedCaseId) {
@@ -794,6 +817,7 @@
 
       <div class="debrief-actions">
         ${otherCase ? `<button type="button" class="btn-primary" id="btnDebriefNextCase">Affronta ${escapeHtml(otherCase.meta.code)} (${escapeHtml(otherCase.meta.patientBadge)}) →</button>` : ''}
+        <a href="${escapeAttr(returnPlatformUrl)}" class="btn-secondary" id="btnDebriefReturnPlatform" style="text-decoration:none;">← Torna a RADAR XLH (Modulo 02)</a>
         <button type="button" class="btn-secondary" id="btnDebriefReset">Ricomincia Questo Caso</button>
         <button type="button" class="btn-secondary" id="btnDebriefPrint">Stampa / Salva Report PDF</button>
         <button type="button" class="btn-secondary" id="btnDebriefTop">Torna all’Apice ↑</button>
