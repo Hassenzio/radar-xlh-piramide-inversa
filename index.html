@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>RADAR XLH — Caso Clinico Interattivo a Piramide Inversa</title>
-  <meta name="description" content="Percorso formativo interattivo a Piramide Inversa per la gestione clinica multidisciplinare dell'Ipofosfatemia X-Linked.">
+  <title>RADAR XLH — Casi Clinici Interattivi a Piramide Inversa</title>
+  <meta name="description" content="Percorsi formativi interattivi a Piramide Inversa per la gestione clinica multidisciplinare dell'Ipofosfatemia X-Linked.">
   <meta name="robots" content="noindex, nofollow">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -14,7 +14,7 @@
   <link rel="icon" type="image/png" href="assets/img/logo.png">
   <link rel="stylesheet" href="assets/styles.css">
 </head>
-<body>
+<body class="is-launcher">
   <div class="radar-backdrop-rings" aria-hidden="true"></div>
   <div class="radar-fondale-watermark" aria-hidden="true"></div>
 
@@ -25,11 +25,15 @@
         <img src="assets/img/logo.png" alt="Logo RADAR XLH" class="hud-logo">
         <div class="hud-brand-text">
           <div class="hud-title">RADAR <span>XLH</span></div>
-          <div class="hud-subtitle">Caso Clinico · Piramide Inversa</div>
+          <div class="hud-subtitle">Casi Clinici · Piramide Inversa</div>
         </div>
       </div>
 
-      <div class="hud-telemetry" aria-live="polite">
+      <div class="hud-launcher-pill" id="hudLauncherBadge">
+        <span>Seleziona un Caso Clinico Interattivo</span>
+      </div>
+
+      <div class="hud-telemetry" id="hudTelemetry" aria-live="polite">
         <div class="cq-gauge-widget" title="Coefficiente di Qualità Clinica (parte dal 100%)">
           <svg class="cq-ring" viewBox="0 0 44 44" aria-hidden="true">
             <circle class="cq-ring-bg" cx="22" cy="22" r="18"></circle>
@@ -58,22 +62,45 @@
         </div>
       </div>
 
-      <div class="hud-actions">
+      <div class="hud-actions" id="hudActions">
+        <button type="button" class="btn-hud btn-hud-cases" id="btnSwitchCase" title="Torna alla scelta dei casi clinici">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          <span>Cambia Caso</span>
+        </button>
         <button type="button" class="btn-hud btn-hud-diary" id="btnOpenTimeline">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
           <span>Diario Clinico</span>
         </button>
-        <button type="button" class="btn-hud btn-hud-restart" id="btnResetSession">
+        <button type="button" class="btn-hud btn-hud-restart" id="btnResetSession" title="Ricomincia il percorso dal 100%">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>
-          <span>Ricomincia Percorso</span>
+          <span>Ricomincia</span>
         </button>
       </div>
     </div>
   </header>
 
   <main class="workspace-main" id="workspaceMain">
-    <!-- ══════════════════ HERO CONTESTUALE DEL CASO CLINICO ══════════════════ -->
-    <section class="case-hero" id="caseHero" aria-label="Intestazione Caso Clinico">
+    <!-- ══════════════════ SCHERMATA INIZIALE DI SCELTA DEI CASI ══════════════════ -->
+    <section class="case-launcher-view" id="caseLauncherView" aria-label="Selezione del Caso Clinico">
+      <div class="launcher-hero">
+        <div class="hero-radar-rings" aria-hidden="true">
+          <span class="ring r1"></span>
+          <span class="ring r2"></span>
+          <span class="ring r3"></span>
+        </div>
+        <div class="hero-radar-sweep" aria-hidden="true"></div>
+        <div class="launcher-hero-inner">
+          <span class="badge-case-live">Percorso Formativo Interattivo · RADAR XLH</span>
+          <h1 class="launcher-title">Casi Clinici Narrativi a Piramide Inversa</h1>
+          <p class="launcher-subtitle">Scegli il caso clinico da affrontare: partirai con un Coefficiente di Qualità (CQ) del 100% e guiderai il paziente lungo 5 Step decisionali progressivi (1 → 2 → 3 → 4 → 5 snodi).</p>
+        </div>
+      </div>
+
+      <div class="case-cards-grid" id="caseCardsGrid"></div>
+    </section>
+
+    <!-- ══════════════════ HERO CONTESTUALE DEL CASO CLINICO ATTIVO ══════════════════ -->
+    <section class="case-hero" id="caseHero" aria-label="Intestazione Caso Clinico" hidden>
       <div class="hero-radar-rings" aria-hidden="true">
         <span class="ring r1"></span>
         <span class="ring r2"></span>
@@ -91,7 +118,7 @@
     </section>
 
     <!-- ══════════════════ LAVAGNA PIRAMIDE INVERSA STEP-BY-STEP ══════════════════ -->
-    <section class="pyramid-viewport" id="pyramidViewport" aria-label="Percorso decisionale a Piramide Inversa">
+    <section class="pyramid-viewport" id="pyramidViewport" aria-label="Percorso decisionale a Piramide Inversa" hidden>
       <div class="pyramid-stage" id="pyramidStage">
         <div class="pyramid-cone-guide" aria-hidden="true"></div>
         <svg class="pyramid-connectors-svg" id="pyramidConnectors" aria-hidden="true"></svg>
@@ -133,7 +160,7 @@
       <header class="dialog-header">
         <div>
           <span class="dialog-domain-pill">Diario Clinico Progressivo</span>
-          <h1 class="dialog-title-sm" id="timelineDialogTitle">Evoluzione Clinica e Decisioni di Matteo</h1>
+          <h1 class="dialog-title-sm" id="timelineDialogTitle">Evoluzione Clinica e Decisioni del Caso</h1>
         </div>
         <button type="button" class="dialog-close-btn" id="btnCloseTimelineDialog" aria-label="Chiudi diario clinico">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
@@ -149,7 +176,7 @@
       <header class="dialog-header">
         <div>
           <span class="dialog-domain-pill">Nuovo Tentativo</span>
-          <h1 class="dialog-title-sm" id="resetDialogTitle">Vuoi ricominciare il percorso clinico?</h1>
+          <h1 class="dialog-title-sm" id="resetDialogTitle">Vuoi ricominciare questo caso clinico?</h1>
         </div>
         <button type="button" class="dialog-close-btn" id="btnCloseResetDialog" aria-label="Chiudi finestra di conferma">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
@@ -157,7 +184,7 @@
       </header>
       <div class="dialog-body">
         <p style="font-size:0.9rem;color:var(--text-secondary);">
-          Le scelte effettuate finora verranno azzerate: ripartirai dallo <strong>Step 1</strong> con il <strong>Coefficiente di Qualità al 100%</strong>.
+          Le scelte effettuate finora per questo paziente verranno azzerate: ripartirai dallo <strong>Step 1</strong> con il <strong>Coefficiente di Qualità al 100%</strong>.
         </p>
       </div>
       <footer class="dialog-footer">

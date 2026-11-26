@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════════════
-   RADAR XLH — Piramide Inversa Didattica Step-by-Step Controller
+   RADAR XLH — Piramide Inversa Multi-Caso · Launcher & Step-by-Step Controller
    ═══════════════════════════════════════════════════════════════════════ */
 
 (function () {
@@ -11,6 +11,7 @@
   const STORAGE_PREFIX = 'radar_xlh_pyramid_didactic_v3_';
   const RING_CIRCUMFERENCE = 2 * Math.PI * 18;
 
+  let currentScreen = 'launcher'; // 'launcher' | 'case'
   let activeCase = CASES_REGISTRY[0];
   let session = null;
   let activeDialogContext = null;
@@ -23,10 +24,14 @@
 
   document.addEventListener('DOMContentLoaded', () => {
     cacheDom();
-    applyUrlParameters();
+    const directCaseId = applyUrlParameters();
     setupDialogFallbacks();
     bindGlobalEvents();
-    loadActiveCase({ restoreFromStorage: true });
+    if (directCaseId) {
+      selectCaseAndStart(directCaseId, { animate: false });
+    } else {
+      openLauncher({ animate: false });
+    }
     observePyramidResize();
   });
 
@@ -39,16 +44,21 @@
     dom.hudSnodoDot = document.getElementById('hudSnodoDot');
     dom.hudActiveSnodo = document.getElementById('hudActiveSnodo');
 
+    dom.caseLauncherView = document.getElementById('caseLauncherView');
+    dom.caseCardsGrid = document.getElementById('caseCardsGrid');
+    dom.caseHero = document.getElementById('caseHero');
     dom.contextBadges = document.getElementById('contextBadges');
     dom.caseTitle = document.getElementById('caseTitle');
     dom.caseSubtitle = document.getElementById('caseSubtitle');
     dom.domainLegendBar = document.getElementById('domainLegendBar');
 
+    dom.pyramidViewport = document.getElementById('pyramidViewport');
     dom.pyramidStage = document.getElementById('pyramidStage');
     dom.pyramidConnectors = document.getElementById('pyramidConnectors');
     dom.pyramidRows = document.getElementById('pyramidRows');
     dom.finalDebriefingSection = document.getElementById('finalDebriefingSection');
 
+    dom.btnSwitchCase = document.getElementById('btnSwitchCase');
     dom.btnOpenTimeline = document.getElementById('btnOpenTimeline');
     dom.btnResetSession = document.getElementById('btnResetSession');
 
@@ -61,6 +71,7 @@
     dom.btnCloseDecisionDialog = document.getElementById('btnCloseDecisionDialog');
 
     dom.patientTimelineDialog = document.getElementById('patientTimelineDialog');
+    dom.timelineDialogTitle = document.getElementById('timelineDialogTitle');
     dom.timelineDialogBody = document.getElementById('timelineDialogBody');
     dom.btnCloseTimelineDialog = document.getElementById('btnCloseTimelineDialog');
 
@@ -80,8 +91,9 @@
     const requestedCaseId = params.get('case');
     if (requestedCaseId) {
       const found = CASES_REGISTRY.find((c) => c.meta.id === requestedCaseId);
-      if (found) activeCase = found;
+      if (found) return found.meta.id;
     }
+    return null;
   }
 
   function setupDialogFallbacks() {
@@ -114,6 +126,7 @@
   }
 
   function bindGlobalEvents() {
+    dom.btnSwitchCase?.addEventListener('click', () => openLauncher({ animate: true }));
     dom.btnOpenTimeline?.addEventListener('click', openTimelineDialog);
     dom.btnCloseTimelineDialog?.addEventListener('click', () => dom.patientTimelineDialog.close());
 
@@ -128,23 +141,110 @@
     });
   }
 
-  function loadActiveCase({ restoreFromStorage }) {
-    let saved = null;
-    if (restoreFromStorage) {
-      try {
-        const raw = sessionStorage.getItem(STORAGE_PREFIX + activeCase.meta.id);
-        if (raw) saved = JSON.parse(raw);
-      } catch (e) {
-        saved = null;
-      }
+  function readSavedSnapshot(caseId) {
+    try {
+      const raw = sessionStorage.getItem(STORAGE_PREFIX + caseId);
+      return raw ? JSON.parse(raw) : null;
+    } catch (e) {
+      return null;
     }
+  }
 
+  function openLauncher({ animate = true } = {}) {
+    const renderFn = () => {
+      currentScreen = 'launcher';
+      document.body.classList.add('is-launcher');
+      dom.caseLauncherView.hidden = false;
+      dom.caseHero.hidden = true;
+      dom.pyramidViewport.hidden = true;
+      dom.finalDebriefingSection.hidden = true;
+      renderLauncherCards();
+      window.scrollTo({ top: 0, behavior: animate ? 'smooth' : 'auto' });
+    };
+
+    if (animate && typeof document.startViewTransition === 'function' && !window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) {
+      document.startViewTransition(renderFn);
+    } else {
+      renderFn();
+    }
+  }
+
+  function renderLauncherCards() {
+    if (!dom.caseCardsGrid) return;
+
+    dom.caseCardsGrid.innerHTML = CASES_REGISTRY.map((caseItem, idx) => {
+      const meta = caseItem.meta;
+      const saved = readSavedSnapshot(meta.id);
+
+      let statusText = 'Da iniziare · CQ 100%';
+      let statusCls = 'status-new';
+      let ctaLabel = 'Avvia Caso Clinico →';
+
+      if (saved) {
+        if (saved.completed) {
+          statusText = `Completato · CQ Finale ${saved.qualityPct}%`;
+          statusCls = 'status-done';
+          ctaLabel = 'Rivedi Percorso & Debriefing →';
+        } else if ((saved.resolvedSnodiCount || 0) > 0 || (saved.activeStep || 1) > 1) {
+          statusText = `In corso · Step ${saved.activeStep} di ${saved.totalSteps} · CQ ${saved.qualityPct}%`;
+          statusCls = 'status-progress';
+          ctaLabel = 'Riprendi Caso Clinico →';
+        }
+      }
+
+      const tagsHtml = (meta.focusTags || [])
+        .map((tag) => `<span class="case-focus-tag">${formatClinicalNoBreak(escapeHtml(tag))}</span>`)
+        .join('');
+
+      return `
+        <article class="case-choice-card" style="--card-idx:${idx};">
+          <div class="case-choice-top">
+            <span class="case-choice-code">${escapeHtml(meta.code)}</span>
+            <span class="case-choice-status ${statusCls}">${escapeHtml(statusText)}</span>
+          </div>
+          <div class="case-choice-patient">${formatClinicalNoBreak(escapeHtml(meta.patientBadge || ''))}</div>
+          <h2 class="case-choice-title">${formatClinicalNoBreak(escapeHtml(meta.title))}</h2>
+          <p class="case-choice-summary">${formatClinicalNoBreak(escapeHtml(meta.launcherSummary || meta.subtitle))}</p>
+          <div class="case-choice-tags">${tagsHtml}</div>
+          <div class="case-choice-footer">
+            <span class="case-choice-meta">5 Step · 15 Snodi Decisionali · 53 Post-it</span>
+            <button type="button" class="btn-primary case-launch-btn" data-launch-case="${escapeAttr(meta.id)}">${ctaLabel}</button>
+          </div>
+        </article>
+      `;
+    }).join('');
+
+    dom.caseCardsGrid.querySelectorAll('[data-launch-case]').forEach((btn) => {
+      btn.addEventListener('click', () => selectCaseAndStart(btn.dataset.launchCase, { animate: true }));
+    });
+  }
+
+  function selectCaseAndStart(caseId, { animate = true } = {}) {
+    const found = CASES_REGISTRY.find((c) => c.meta.id === caseId) || CASES_REGISTRY[0];
+    activeCase = found;
+
+    const saved = readSavedSnapshot(activeCase.meta.id);
     session = createSession(activeCase, saved);
     const snap = session.getSnapshot();
     lastUnlockedStep = snap.completed ? snap.totalSteps : snap.activeStep;
     displayedQualityPct = snap.qualityPct;
-    if (dom.hudQualityDelta) dom.hudQualityDelta.hidden = true;
-    renderAll({ newlyUnlockedStep: null });
+
+    const enterCaseView = () => {
+      currentScreen = 'case';
+      document.body.classList.remove('is-launcher');
+      dom.caseLauncherView.hidden = true;
+      dom.caseHero.hidden = false;
+      dom.pyramidViewport.hidden = false;
+      if (dom.hudQualityDelta) dom.hudQualityDelta.hidden = true;
+      renderAll({ newlyUnlockedStep: null });
+      window.scrollTo({ top: 0, behavior: animate ? 'smooth' : 'auto' });
+    };
+
+    if (animate && typeof document.startViewTransition === 'function' && !window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) {
+      document.startViewTransition(enterCaseView);
+    } else {
+      enterCaseView();
+    }
   }
 
   function saveSessionSnapshot() {
@@ -180,7 +280,7 @@
     const meta = activeCase.meta;
     dom.contextBadges.innerHTML = `
       <span class="badge-case-code">${escapeHtml(meta.code)}</span>
-      <span class="badge-case-live">Percorso Clinico Interattivo</span>
+      <span class="badge-case-live">${formatClinicalNoBreak(escapeHtml(meta.patientBadge || 'Percorso Clinico Interattivo'))}</span>
     `;
     dom.caseTitle.innerHTML = formatClinicalNoBreak(escapeHtml(meta.title));
     dom.caseSubtitle.innerHTML = formatClinicalNoBreak(escapeHtml(meta.subtitle));
@@ -245,7 +345,7 @@
       dom.hudSnodoDot.style.backgroundColor = snap.completed ? '#10B981' : (domainColor || '#3BA5DB');
     }
     dom.hudActiveSnodo.textContent = snap.completed
-      ? 'Percorso Completato (Debriefing)'
+      ? 'Percorso Completato'
       : `${activeSnodo?.snodoCode || ''} · ${activeSnodo?.domainLabel || ''}`;
 
     dom.hudStepPills.innerHTML = activeCase.steps.map((st) => {
@@ -306,14 +406,13 @@
           <div class="apex-quotes">${quotesHtml}</div>
           <div class="apex-params">${paramsHtml}</div>
           <details class="apex-dossier-details">
-            <summary>Consulta la Scheda Iniziale Completa del Paziente (Anamnesi remota, PHEX, Chiari I, Scoliosi)</summary>
+            <summary>Consulta la Scheda Iniziale Completa del Paziente</summary>
             <div class="apex-sections-grid">${sectionsHtml}</div>
           </details>
         </article>
       </div>
     `;
 
-    // SVELAMENTO PROGRESSIVO STEP-BY-STEP: mostra solo gli step <= activeStep (o tutti se completato)
     const maxVisibleStep = snap.completed ? snap.totalSteps : snap.activeStep;
     const visibleSteps = activeCase.steps.filter((s) => s.stepNumber <= maxVisibleStep);
 
@@ -625,6 +724,8 @@
 
     dom.finalDebriefingSection.hidden = false;
 
+    const otherCase = CASES_REGISTRY.find((c) => c.meta.id !== activeCase.meta.id);
+
     const rowsHtml = report.timeline.map((item) => {
       const badgeCls = item.isCorrect ? 'pill-optimal' : 'pill-error';
       const badgeText = item.isCorrect ? 'Corretta' : 'Errata';
@@ -692,12 +793,16 @@
       </div>
 
       <div class="debrief-actions">
-        <button type="button" class="btn-primary" id="btnDebriefReset">Ricomincia Percorso</button>
+        ${otherCase ? `<button type="button" class="btn-primary" id="btnDebriefNextCase">Affronta ${escapeHtml(otherCase.meta.code)} (${escapeHtml(otherCase.meta.patientBadge)}) →</button>` : ''}
+        <button type="button" class="btn-secondary" id="btnDebriefReset">Ricomincia Questo Caso</button>
         <button type="button" class="btn-secondary" id="btnDebriefPrint">Stampa / Salva Report PDF</button>
         <button type="button" class="btn-secondary" id="btnDebriefTop">Torna all’Apice ↑</button>
       </div>
     `;
 
+    document.getElementById('btnDebriefNextCase')?.addEventListener('click', () => {
+      if (otherCase) selectCaseAndStart(otherCase.meta.id, { animate: true });
+    });
     document.getElementById('btnDebriefReset')?.addEventListener('click', () => dom.resetConfirmDialog.showModal());
     document.getElementById('btnDebriefPrint')?.addEventListener('click', () => window.print());
     document.getElementById('btnDebriefTop')?.addEventListener('click', () => {
@@ -708,6 +813,10 @@
   function openTimelineDialog() {
     if (!session) return;
     const snap = session.getSnapshot();
+    if (dom.timelineDialogTitle) {
+      dom.timelineDialogTitle.innerHTML = `Evoluzione Clinica · ${formatClinicalNoBreak(escapeHtml(activeCase.meta.patientBadge || activeCase.meta.title))}`;
+    }
+
     const entries = [
       `
         <div class="timeline-entry">
@@ -750,6 +859,7 @@
   }
 
   function drawPyramidConnectors(animateNew) {
+    if (currentScreen !== 'case') return;
     const svg = dom.pyramidConnectors;
     const stage = dom.pyramidStage;
     if (!svg || !stage || !session) return;

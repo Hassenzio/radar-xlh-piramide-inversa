@@ -18,9 +18,12 @@
   const CASO_202_MATTEO = {
     meta: {
       id: 'caso-202-xlh-pregresso',
-      code: 'CASO 2.02',
-      title: 'XLH con Patologia Pregressa — Matteo, 26 anni',
+      code: 'CASO 01',
+      title: 'XLH nell’Adulto con Patologia Pregressa — Matteo, 26 anni',
       subtitle: 'Caso clinico interattivo narrativo a 5 Step (1 → 2 → 3 → 4 → 5 snodi) su continuità assistenziale dell’adulto, team multidisciplinare e mappatura familiare',
+      patientBadge: 'Matteo · 26 anni (Adulto)',
+      focusTags: ['Transizione Adulto', 'Team Multidisciplinare', 'Chiari I & Scoliosi', 'Ereditarietà X‑Linked'],
+      launcherSummary: 'Paziente di 26 anni con diagnosi a 6 mesi (variante PHEX, familiarità materna), scoliosi lombare, ascessi dentali ricorrenti, frattura del coccige e intervento per Chiari tipo I, oggi esposto al rischio di follow-up interrotto.',
       status: 'active',
       isCalibration: false,
       authors: 'Governance Scientifica RADAR XLH · Script Ufficiale 2.02',
@@ -778,7 +781,770 @@
     ]
   };
 
+  const CASO_202_ELENA = {
+    meta: {
+      id: 'caso-202-elena-adolescente',
+      code: 'CASO 02',
+      title: 'XLH in Adolescenza con Patologia Pregressa — Elena, 15 anni',
+      subtitle: 'Caso clinico interattivo narrativo a 5 Step (1 → 2 → 3 → 4 → 5 snodi) su carico psicologico adolescenziale, continuità terapeutica, gestione multidisciplinare e family mapping',
+      patientBadge: 'Elena · 15 anni (Adolescente)',
+      focusTags: ['Carico Psicologico', 'Continuità Terapeutica', 'Deformità & Crescita', 'Ereditarietà X‑Linked'],
+      launcherSummary: 'Ragazza di 15 anni con diagnosi infantile di XLH (mutazione PHEX), deformità degli arti inferiori, bassa statura e pregresso ascesso dentale, alle prese con dolore, rigidità e un crescente carico psicologico in adolescenza.',
+      status: 'active',
+      isCalibration: false,
+      authors: 'Governance Scientifica RADAR XLH · Script Ufficiale 2.02',
+      targetSpecialties: [
+        'Pediatri',
+        'PLS',
+        'Endocrinologi',
+        'Ortopedici',
+        'Fisiatri',
+        'Odontoiatri',
+        'Psicologi'
+      ],
+      initialQualityPct: 100,
+      passThresholdPct: 75,
+      sourceReference: '2.02 secondo caso pregresso (Elena, 15 anni)'
+    },
+
+    apex: {
+      code: 'STEP 0 · APICE DELLA PIRAMIDE',
+      badge: 'Caso Clinico Ufficiale · Elena, 15 anni',
+      title: 'Inquadramento Iniziale & Briefing Narrativo d’Ingresso',
+      briefingQuotes: [
+        '“Sei il medico chiamato a seguire Elena, 15 anni, un’adolescente che conosce il peso della malattia fin da bambina. La sua storia clinica non inizia oggi: ha ricevuto diagnosi di XLH durante l’infanzia, ha affrontato deformità degli arti inferiori, bassa statura e un episodio di ascesso dentale, ma nell’adolescenza il vissuto cambia volto – il carico psicologico si fa più pesante, la voglia di somigliare ai coetanei entra in tensione con sintomi come dolore, rigidità e ridotta mobilità, e il rischio di rallentare o interrompere il percorso è dietro l’angolo.”',
+        '“Le evidenze raccolte nel notebook mostrano che durante l’adolescenza aumenta il carico psicologico dell’XLH e che un trattamento continuo e ininterrotto è necessario per sostenere i benefici clinici e biologici e prevenire la progressione delle complicanze. Partendo da un Coefficiente di Qualità (CQ) del 100%, ogni scelta che farai lungo questa piramide discendente determinerà la qualità della presa in carico di Elena e l’andamento del suo percorso.”'
+      ],
+      clinicalParameters: [
+        { label: 'Paziente', value: 'Elena, Femmina, 15 anni', flag: 'info' },
+        { label: 'Diagnosi XLH', value: 'Infantile · Mutazione PHEX', flag: 'core' },
+        { label: 'Ereditarietà', value: 'X‑Linked Dominante', flag: 'info' },
+        { label: 'Storia Pregressa', value: 'Deformità arti inf. · Bassa statura · Ascesso dentale', flag: 'alert' },
+        { label: 'Stato Attuale', value: 'Dolore, rigidità, carico psicologico adolescenziale', flag: 'alert' }
+      ],
+      sections: [
+        {
+          heading: 'Dati anagrafici, diagnosi e fisiopatologia',
+          items: [
+            'Paziente femmina, 15 anni (adolescente), in una fase evolutiva in cui l’impatto psicologico della malattia aumenta accanto alle sfide legate a crescita, scheletro, mobilità e continuità delle cure.',
+            'Ipofosfatemia X‑Linked (XLH) nota dall’infanzia, legata a mutazioni con perdita di funzionalità del gene PHEX (cromosoma X), con eccesso di FGF23, perdita renale di fosfato, ipofosfatemia e ridotta idrossilazione della vitamina D nel rene.'
+          ]
+        },
+        {
+          heading: 'Anamnesi patologica pregressa e familiarità',
+          items: [
+            'Esordio in età infantile con deformità degli arti inferiori e bassa statura/crescita compromessa, associati a pregresso ascesso dentale riconducibile a difetti di mineralizzazione (dentina/smalto) e a una storia di trattamento/follow-up pediatrico da mantenere in continuità nell’adolescenza.',
+            'Malattia genetica a trasmissione X‑Linked dominante (con possibilità di familiarità materna o paterna o mutazioni sporadiche), in cui tutti i familiari a rischio devono essere considerati per lo screening (family mapping) e per eventuale consulenza genetica in prospettiva futura.'
+          ]
+        },
+        {
+          heading: 'Stato clinico attuale e fattori gestionali indispensabili',
+          items: [
+            'Riferisce dolore muscoloscheletrico, rigidità e fatica/limitazione della funzionalità fisica nelle attività quotidiane e scolastiche/sportive, accompagnate da un crescente carico psicologico e relazionale tipico dell’adolescenza.',
+            'Coordinamento multidisciplinare guidato da specialista esperto, valutazione clinica/biochimica/dentale/funzionale/qualità di vita, continuità terapeutica e monitoraggio regolare, comunicazione empatica attenta al benessere mentale e all’aderenza dell’adolescente.'
+          ]
+        }
+      ]
+    },
+
+    steps: [
+      /* ══════════════════ STEP 1 — 1 SNODO (2 POST-IT) ══════════════════ */
+      {
+        stepNumber: 1,
+        title: 'Primo Avanzamento',
+        preChoiceEvolutionByBranch: {
+          default: {
+            headline: 'Aggiornamento Narrativo Evolutivo (Prima della Scelta)',
+            narrative: 'Elena (15 anni) si siede in ambulatorio tenendo le spalle leggermente curvate e riferisce che, oltre a dolore osseo/muscoloscheletrico e rigidità quando cammina o sta in piedi a lungo, si sente stanca e spesso a disagio rispetto alle compagne di scuola. Ricorda la diagnosi infantile, le gambe segnate dalle deformità, la bassa statura e un vecchio ascesso dentale, e lascia intendere che a volte vorrebbe “staccare” da visite e terapie per sentirsi come tutte le altre.'
+          }
+        },
+        snodi: [
+          {
+            snodoId: 'e-s1-1',
+            snodoCode: '1.1',
+            domainKey: 'comunicazionale',
+            domainLabel: 'Scelta Comunicazionale',
+            valueWeight: 100,
+            tiles: [
+              {
+                id: 'S1-COM-A',
+                headline: 'Accogliere il carico psicologico dell’adolescenza e spiegare l’importanza della continuità',
+                bodyText: 'Validare fatica, dolore, rigidità e vissuto emotivo legato alla malattia, spiegando che l’XLH prosegue oltre l’infanzia e che seguire il percorso aiuta a proteggere funzionalità e benessere.',
+                isCorrect: true,
+                qualityDeltaPct: 0,
+                valuePoints: 100,
+                nextBranchKey: 'from_s1_a',
+                feedbackText: 'Corretto. Durante l’adolescenza aumenta il carico psicologico dell’XLH e mobilità limitata, dolore cronico e fatica incidono sul benessere mentale; una comunicazione attenta favorisce continuità e aderenza.',
+                evolutionImpact: 'Elena abbassa le difese, racconta con maggiore sincerità dolore, rigidità e stanchezza e accetta i controlli.'
+              },
+              {
+                id: 'S1-COM-B',
+                headline: 'Sminuire l’impatto emotivo e dire che a 15 anni basta “stringere i denti”',
+                bodyText: 'Liquidare il disagio psicologico e l’affaticamento come normali capricci adolescenziali.',
+                isCorrect: false,
+                qualityDeltaPct: -15,
+                valuePoints: 0,
+                nextBranchKey: 'from_s1_b',
+                feedbackText: 'Errato (-15% CQ). L’adolescenza comporta un aumento del carico psicologico dell’XLH e i sintomi cronici impattano su funzionalità e benessere mentale; minimizzare ostacola la presa in carico.',
+                evolutionImpact: 'Elena si chiude e risponde in modo evasivo alle domande su sintomi e abitudini.'
+              }
+            ]
+          }
+        ]
+      },
+
+      /* ══════════════════ STEP 2 — 2 SNODI (3 + 3 = 6 POST-IT) ══════════════════ */
+      {
+        stepNumber: 2,
+        title: 'Secondo Avanzamento',
+        preChoiceEvolutionByBranch: {
+          default: {
+            headline: 'Aggiornamento Narrativo Evolutivo (Prima della Scelta)',
+            narrative: 'Elena descrive dolore muscoloscheletrico e rigidità che riducono la funzionalità fisica nella vita quotidiana, ricorda la storia infantile di deformità degli arti inferiori, bassa statura e pregresso ascesso dentale.'
+          },
+          from_s1_a: {
+            headline: 'Evoluzione dopo S1-COM-A · Apertura e Collaborazione Clinica',
+            narrative: 'Elena descrive con chiarezza dolore muscoloscheletrico e rigidità che riducono la funzionalità fisica nella vita quotidiana, ricorda la storia infantile di deformità degli arti inferiori, bassa statura e pregresso ascesso dentale e accetta di essere visitata.'
+          },
+          from_s1_b: {
+            headline: 'Evoluzione dopo S1-COM-B · Chiusura Emotiva nonostante i Sintomi',
+            narrative: 'Elena resta trattenuta, ma ribadisce che il dolore, la rigidità e la fatica limitano ciò che riesce a fare durante la giornata nonostante la storia clinica già nota.'
+          }
+        },
+        snodi: [
+          {
+            snodoId: 'e-s2-1',
+            snodoCode: '2.1',
+            domainKey: 'investigativa',
+            domainLabel: 'Scelta Investigativa / Esaminazione',
+            valueWeight: 100,
+            tiles: [
+              {
+                id: 'S2-INV-A',
+                headline: 'Anamnesi completa (personale, familiare, pregressa) ed esame clinico mirato',
+                bodyText: 'Raccogliere anamnesi familiare ed evolutiva (diagnosi infantile, PHEX, deformità arti inferiori, bassa statura, pregresso ascesso dentale) ed eseguire esame clinico su dolore, rigidità, mobilità, postura/scheletro e sintomi associati.',
+                isCorrect: true,
+                qualityDeltaPct: 0,
+                valuePoints: 100,
+                feedbackText: 'Corretto. L’inquadramento integra anamnesi personale e familiare con esame clinico mirato a segni, sintomi, storia pregressa e funzionalità.'
+              },
+              {
+                id: 'S2-INV-B',
+                headline: 'Limitarsi a chiedere se ha mal di denti oggi senza anamnesi familiare né valutazione scheletrica/funzionale',
+                bodyText: 'Ridurre la visita a un singolo sintomo pregresso.',
+                isCorrect: false,
+                qualityDeltaPct: -10,
+                valuePoints: 0,
+                feedbackText: 'Errato (-10% CQ). L’XLH è una patologia multisistemica con manifestazioni scheletriche, dentali, muscoloscheletriche e familiari che vanno valutate nel loro insieme.'
+              },
+              {
+                id: 'S2-INV-C',
+                headline: 'Rinviare anamnesi ed esame clinico a un controllo generico tra un anno',
+                bodyText: 'Non indagare ora il quadro clinico.',
+                isCorrect: false,
+                qualityDeltaPct: -10,
+                valuePoints: 0,
+                feedbackText: 'Errato (-10% CQ). Il ritardo nella valutazione e nella gestione può determinare esiti clinici peggiori e conseguenze a lungo termine.'
+              }
+            ]
+          },
+          {
+            snodoId: 'e-s2-2',
+            snodoCode: '2.2',
+            domainKey: 'diagnostica',
+            domainLabel: 'Scelta Diagnostica',
+            valueWeight: 100,
+            tiles: [
+              {
+                id: 'S2-DIA-A',
+                headline: 'Valutazione biochimica mirata, verifica genetica/FGF23 e imaging appropriato',
+                bodyText: 'Valutare fosfato sierico e perdita renale di fosfato, parametri biochimici correlati (ALP/BALP, calcio, PTH, FGF23 se indicato), conferma genetica (PHEX) quando possibile e imaging mirato in base a segni/sintomi.',
+                isCorrect: true,
+                qualityDeltaPct: 0,
+                valuePoints: 100,
+                feedbackText: 'Corretto. La diagnosi combina caratteristiche cliniche, biochimiche, radiografiche e genetiche, con conferma genetica quando possibile.'
+              },
+              {
+                id: 'S2-DIA-B',
+                headline: 'Dosare solo il calcio sierico escludendo fosfato e perdita renale di fosfato',
+                bodyText: 'Ritenere sufficiente il calcio.',
+                isCorrect: false,
+                qualityDeltaPct: -10,
+                valuePoints: 0,
+                feedbackText: 'Errato (-10% CQ). L’XLH è caratterizzata da ipofosfatemia dovuta a perdita renale di fosfato ed eccesso di FGF23.'
+              },
+              {
+                id: 'S2-DIA-C',
+                headline: 'Non richiedere alcun esame ematochimico né strumentale',
+                bodyText: 'Basarsi solo sull’impressione iniziale.',
+                isCorrect: false,
+                qualityDeltaPct: -15,
+                valuePoints: 0,
+                feedbackText: 'Errato (-15% CQ). L’inquadramento richiede una combinazione integrata di dati clinici, biochimici, radiografici e genetici.'
+              }
+            ]
+          }
+        ]
+      },
+
+      /* ══════════════════ STEP 3 — 3 SNODI (3 + 3 + 3 = 9 POST-IT) ══════════════════ */
+      {
+        stepNumber: 3,
+        title: 'Terzo Avanzamento',
+        preChoiceEvolutionByBranch: {
+          default: {
+            headline: 'Aggiornamento Narrativo Evolutivo (Prima della Scelta)',
+            narrative: 'Gli elementi raccolti confermano il quadro di XLH (mutazione con perdita di funzione di PHEX, eccesso di FGF23 e perdita renale di fosfato) in una ragazza di 15 anni con pregresse deformità degli arti inferiori, bassa statura e pregresso ascesso dentale, ora alle prese con dolore, rigidità, limitazioni funzionali e un sensibile carico psicologico.'
+          }
+        },
+        snodi: [
+          {
+            snodoId: 'e-s3-1',
+            snodoCode: '3.1',
+            domainKey: 'gestionale',
+            domainLabel: 'Scelta Gestionale',
+            valueWeight: 100,
+            tiles: [
+              {
+                id: 'S3-GES-A',
+                headline: 'Attivare un team multidisciplinare coordinato da uno specialista in malattie metaboliche dell’osso',
+                bodyText: 'Includere, in base alle esigenze individuali di Elena, figure come odontoiatria, fisioterapia, terapia del dolore e supporto psicologico/salute mentale.',
+                isCorrect: true,
+                qualityDeltaPct: 0,
+                valuePoints: 100,
+                feedbackText: 'Corretto. L’assistenza deve essere organizzata e coordinata da uno specialista esperto in malattie metaboliche dell’osso con un team multidisciplinare che includa, quando appropriato, fisioterapia e supporto per la salute mentale.'
+              },
+              {
+                id: 'S3-GES-B',
+                headline: 'Gestire il caso in modo isolato senza coordinamento multidisciplinare',
+                bodyText: 'Lasciare i diversi aspetti senza regia.',
+                isCorrect: false,
+                qualityDeltaPct: -10,
+                valuePoints: 0,
+                feedbackText: 'Errato (-10% CQ). La mancanza di coordinamento multidisciplinare rende meno efficace la presa in carico di una patologia cronica e multisistemica.'
+              },
+              {
+                id: 'S3-GES-C',
+                headline: 'Dimettere la paziente invitandola a tornare solo se peggiora',
+                bodyText: 'Non impostare continuità assistenziale.',
+                isCorrect: false,
+                qualityDeltaPct: -15,
+                valuePoints: 0,
+                feedbackText: 'Errato (-15% CQ). L’XLH è una patologia rara, cronica e progressiva che dura tutta la vita e richiede continuità di cura.'
+              }
+            ]
+          },
+          {
+            snodoId: 'e-s3-2',
+            snodoCode: '3.2',
+            domainKey: 'diagnostica',
+            domainLabel: 'Scelta Diagnostica',
+            valueWeight: 100,
+            tiles: [
+              {
+                id: 'S3-DIA-A',
+                headline: 'Integrare conferma genetica (PHEX) e valutazione biochimico-radiografica mirata',
+                bodyText: 'Considerare la conferma genetica ogni volta che è possibile (e in assenza di analisi genetica molecolare, storia familiare legata all’X, FGF23 intatto non soppresso e ipofosfatemia) con valutazione mirata di segni/sintomi.',
+                isCorrect: true,
+                qualityDeltaPct: 0,
+                valuePoints: 100,
+                feedbackText: 'Corretto. La diagnosi si basa sulla combinazione di caratteristiche cliniche, biochimiche, radiografiche e genetiche e dovrebbe essere confermata mediante test genetici quando possibile.'
+              },
+              {
+                id: 'S3-DIA-B',
+                headline: 'Fermare qualsiasi inquadramento se un nuovo test genetico non è immediatamente disponibile',
+                bodyText: 'Bloccare il percorso.',
+                isCorrect: false,
+                qualityDeltaPct: -10,
+                valuePoints: 0,
+                feedbackText: 'Errato (-10% CQ). Se l’analisi genetica molecolare non è disponibile, la diagnosi è supportata da storia familiare X‑Linked, FGF23 non soppresso e ipofosfatemia.'
+              },
+              {
+                id: 'S3-DIA-C',
+                headline: 'Scambiare il quadro per un semplice deficit nutrizionale di vitamina D senza verificare il profilo biochimico/renale',
+                bodyText: 'Ignorare la perdita renale di fosfato.',
+                isCorrect: false,
+                qualityDeltaPct: -10,
+                valuePoints: 0,
+                feedbackText: 'Errato (-10% CQ). L’XLH è caratterizzata da perdita renale di fosfato e anomalie della mineralizzazione ossea legate all’eccesso di FGF23.'
+              }
+            ]
+          },
+          {
+            snodoId: 'e-s3-3',
+            snodoCode: '3.3',
+            domainKey: 'comunicazionale',
+            domainLabel: 'Scelta Comunicazionale',
+            valueWeight: 100,
+            tiles: [
+              {
+                id: 'S3-COM-A',
+                headline: 'Spiegare in modo chiaro fisiopatologia e perché la cura conta anche nell’adolescenza',
+                bodyText: 'Chiarire come il gene PHEX e l’eccesso di FGF23 determinino perdita di fosfato e sintomi che impattano su ossa, mobilità e benessere.',
+                isCorrect: true,
+                qualityDeltaPct: 0,
+                valuePoints: 100,
+                feedbackText: 'Corretto. Una maggiore comprensione dell’impatto della malattia favorisce consapevolezza, benessere e continuità assistenziale.'
+              },
+              {
+                id: 'S3-COM-B',
+                headline: 'Dare istruzioni tecniche senza spiegare il senso del percorso',
+                bodyText: 'Lasciare Elena senza contesto.',
+                isCorrect: false,
+                qualityDeltaPct: -5,
+                valuePoints: 0,
+                feedbackText: 'Errato (-5% CQ). La scarsa consapevolezza del bisogno di assistenza continuativa ostacola l’aderenza e la continuità di cura.'
+              },
+              {
+                id: 'S3-COM-C',
+                headline: 'Affermare che le manifestazioni pregresse dell’infanzia non abbiano alcun legame con il presente',
+                bodyText: 'Negare la continuità evolutiva.',
+                isCorrect: false,
+                qualityDeltaPct: -10,
+                valuePoints: 0,
+                feedbackText: 'Errato (-10% CQ). L’XLH è una malattia progressiva che dura tutta la vita, con conseguenze ed evoluzioni che richiedono attenzione continua.'
+              }
+            ]
+          }
+        ]
+      },
+
+      /* ══════════════════ STEP 4 — 4 SNODI (4 x 4 = 16 POST-IT) ══════════════════ */
+      {
+        stepNumber: 4,
+        title: 'Quarto Avanzamento',
+        preChoiceEvolutionByBranch: {
+          default: {
+            headline: 'Aggiornamento Narrativo Evolutivo (Prima della Scelta)',
+            narrative: 'Elena (15 anni) ha compreso meglio il quadro, ma continua ad avvertire dolore, rigidità e difficoltà funzionali nelle attività quotidiane, oltre a temere che l’interruzione o l’irregolarità del trattamento faccia tornare i sintomi e peggiori la funzionalità. Le evidenze indicano che negli adolescenti il trattamento continuo e ininterrotto è necessario per sostenere i benefici clinici e biologici e prevenire la progressione di complicanze.'
+          }
+        },
+        snodi: [
+          {
+            snodoId: 'e-s4-1',
+            snodoCode: '4.1',
+            domainKey: 'gestionale',
+            domainLabel: 'Scelta Gestionale',
+            valueWeight: 100,
+            tiles: [
+              {
+                id: 'S4-GES-A',
+                headline: 'Coordinare la rete multidisciplinare sulle esigenze individuali di Elena',
+                bodyText: 'Attivare sotto regia dello specialista esperto in malattie metaboliche dell’osso il supporto psicologico/salute mentale, la fisioterapia/riabilitazione e il monitoraggio odontoiatrico per la storia di ascesso dentale.',
+                isCorrect: true,
+                qualityDeltaPct: 0,
+                valuePoints: 100,
+                feedbackText: 'Corretto. Un team multidisciplinare coordinato, includendo quando appropriato fisioterapia e supporto per la salute mentale, sostiene funzionalità e benessere.'
+              },
+              {
+                id: 'S4-GES-B',
+                headline: 'Escludere il supporto per la salute mentale nonostante l’aumento del carico psicologico in adolescenza',
+                bodyText: 'Ignorare il benessere emotivo.',
+                isCorrect: false,
+                qualityDeltaPct: -10,
+                valuePoints: 0,
+                feedbackText: 'Errato (-10% CQ). Durante l’adolescenza aumenta il carico psicologico dell’XLH e dolore, rigidità e mobilità limitata possono impattare sul benessere mentale.'
+              },
+              {
+                id: 'S4-GES-C',
+                headline: 'Trascurare la prevenzione odontoiatrica nonostante il pregresso ascesso dentale',
+                bodyText: 'Non considerare il rischio dentale.',
+                isCorrect: false,
+                qualityDeltaPct: -10,
+                valuePoints: 0,
+                feedbackText: 'Errato (-10% CQ). Le complicanze dentali (come ascessi legati a scarsa mineralizzazione della dentina e rischio parodontale) fanno parte del quadro XLH.'
+              },
+              {
+                id: 'S4-GES-D',
+                headline: 'Non fissare un referente o un controllo periodico',
+                bodyText: 'Lasciare il percorso senza continuità.',
+                isCorrect: false,
+                qualityDeltaPct: -15,
+                valuePoints: 0,
+                feedbackText: 'Errato (-15% CQ). La continuità dell’assistenza è indispensabile per prevenire peggioramenti e interruzioni.'
+              }
+            ]
+          },
+          {
+            snodoId: 'e-s4-2',
+            snodoCode: '4.2',
+            domainKey: 'diagnostica',
+            domainLabel: 'Scelta Diagnostica',
+            valueWeight: 100,
+            tiles: [
+              {
+                id: 'S4-DIA-A',
+                headline: 'Valutare parametri biochimici, funzionalità, stato dentale e imaging mirato alle esigenze cliniche',
+                bodyText: 'Integrare controllo biochimico, valutazione dentale e accertamenti strumentali mirati in base ai segni/sintomi e alla storia clinica.',
+                isCorrect: true,
+                qualityDeltaPct: 0,
+                valuePoints: 100,
+                feedbackText: 'Corretto. La valutazione deve essere personalizzata in base a manifestazioni cliniche, biochimiche, radiografiche e storia clinica.'
+              },
+              {
+                id: 'S4-DIA-B',
+                headline: 'Non eseguire alcun controllo biochimico, dentale o funzionale',
+                bodyText: 'Procedere senza verifiche oggettive.',
+                isCorrect: false,
+                qualityDeltaPct: -10,
+                valuePoints: 0,
+                feedbackText: 'Errato (-10% CQ). Il monitoraggio clinico, biochimico, funzionale e dentale è essenziale per seguire l’andamento della malattia.'
+              },
+              {
+                id: 'S4-DIA-C',
+                headline: 'Dare per scontato che i sintomi riferiti non abbiano correlazione con la malattia',
+                bodyText: 'Ignorare dolore e rigidità.',
+                isCorrect: false,
+                qualityDeltaPct: -10,
+                valuePoints: 0,
+                feedbackText: 'Errato (-10% CQ). Dolore, rigidità e limitazioni funzionali sono manifestazioni centrali dell’XLH e vanno valutate con attenzione.'
+              },
+              {
+                id: 'S4-DIA-D',
+                headline: 'Applicare una valutazione generica non adattata al profilo individuale',
+                bodyText: 'Ignorare la variabilità interindividuale.',
+                isCorrect: false,
+                qualityDeltaPct: -5,
+                valuePoints: 0,
+                feedbackText: 'Errato (-5% CQ). Le manifestazioni dell’XLH variano da persona a persona e richiedono un approccio personalizzato.'
+              }
+            ]
+          },
+          {
+            snodoId: 'e-s4-3',
+            snodoCode: '4.3',
+            domainKey: 'terapeutica',
+            domainLabel: 'Scelta Terapeutica',
+            valueWeight: 100,
+            tiles: [
+              {
+                id: 'S4-TER-A',
+                headline: 'Garantire continuità terapeutica personalizzata sul profilo clinico e sui bisogni della paziente',
+                bodyText: 'Impostare/mantenere una terapia mirata e personalizzata in base a manifestazioni cliniche, storia clinica e giudizio dello specialista, sottolineando la continuità per sostenere i benefici su dolore e funzionalità.',
+                isCorrect: true,
+                qualityDeltaPct: 0,
+                valuePoints: 100,
+                feedbackText: 'Corretto. Trattamento e monitoraggio vanno personalizzati e mantenuti con continuità per sostenere i benefici clinici e biologici e prevenire la progressione delle complicanze.'
+              },
+              {
+                id: 'S4-TER-B',
+                headline: 'Consigliare di sospendere o diradare liberamente la terapia ogni volta che si sente meno stanca',
+                bodyText: 'Favorire l’interruzione discontinua.',
+                isCorrect: false,
+                qualityDeltaPct: -15,
+                valuePoints: 0,
+                feedbackText: 'Errato (-15% CQ). L’interruzione o la riduzione non guidata del trattamento può comportare la ricomparsa di dolore osseo e compromissione funzionale e la perdita dei benefici.'
+              },
+              {
+                id: 'S4-TER-C',
+                headline: 'Impostare il trattamento senza pianificare il monitoraggio di efficacia e sicurezza',
+                bodyText: 'Trascurare la sorveglianza.',
+                isCorrect: false,
+                qualityDeltaPct: -10,
+                valuePoints: 0,
+                feedbackText: 'Errato (-10% CQ). Il trattamento richiede un monitoraggio regolare e personalizzato per valutare risposta e potenziali eventi avversi.'
+              },
+              {
+                id: 'S4-TER-D',
+                headline: 'Ignorare le difficoltà pratiche o le preferenze di gestione nella vita quotidiana',
+                bodyText: 'Non adattare il piano.',
+                isCorrect: false,
+                qualityDeltaPct: -10,
+                valuePoints: 0,
+                feedbackText: 'Errato (-10% CQ). Tenere conto dei bisogni individuali della paziente aiuta a rendere sostenibile il percorso nel tempo.'
+              }
+            ]
+          },
+          {
+            snodoId: 'e-s4-4',
+            snodoCode: '4.4',
+            domainKey: 'comunicazionale',
+            domainLabel: 'Scelta Comunicazionale',
+            valueWeight: 100,
+            tiles: [
+              {
+                id: 'S4-COM-A',
+                headline: 'Coinvolgere Elena in modo empatico e trasparente sugli obiettivi del percorso',
+                bodyText: 'Spiegare perché la continuità delle cure protegge mobilità, funzionalità e qualità di vita, ascoltando dubbi e timori.',
+                isCorrect: true,
+                qualityDeltaPct: 0,
+                valuePoints: 100,
+                feedbackText: 'Corretto. Una comunicazione chiara ed empatica rafforza la consapevolezza e sostiene la continuità assistenziale.'
+              },
+              {
+                id: 'S4-COM-B',
+                headline: 'Promettere che il trattamento eliminerà all’istante ogni traccia passata o futura della malattia',
+                bodyText: 'Creare aspettative non realistiche.',
+                isCorrect: false,
+                qualityDeltaPct: -10,
+                valuePoints: 0,
+                feedbackText: 'Errato (-10% CQ). L’XLH è una condizione cronica e progressiva che richiede un inquadramento realistico di benefici, continuità e monitoraggio.'
+              },
+              {
+                id: 'S4-COM-C',
+                headline: 'Rimproverare Elena per i momenti di esitazione o stanchezza verso le cure',
+                bodyText: 'Adottare un tono colpevolizzante.',
+                isCorrect: false,
+                qualityDeltaPct: -10,
+                valuePoints: 0,
+                feedbackText: 'Errato (-10% CQ). Il carico psicologico e i sintomi cronici richiedono ascolto e supporto, non colpevolizzazione.'
+              },
+              {
+                id: 'S4-COM-D',
+                headline: 'Parlare esclusivamente con i genitori ignorando la diretta interessata',
+                bodyText: 'Escludere la quindicenne dal dialogo.',
+                isCorrect: false,
+                qualityDeltaPct: -5,
+                valuePoints: 0,
+                feedbackText: 'Errato (-5% CQ). Coinvolgere la paziente in modo adeguato all’età favorisce comprensione e adesione continua.'
+              }
+            ]
+          }
+        ]
+      },
+
+      /* ══════════════════ STEP 5 — 5 SNODI (5 x 4 = 20 POST-IT) ══════════════════ */
+      {
+        stepNumber: 5,
+        title: 'Quinto Avanzamento',
+        preChoiceEvolutionByBranch: {
+          default: {
+            headline: 'Aggiornamento Narrativo Evolutivo (Prima della Scelta)',
+            narrative: 'Elena (15 anni) ha intrapreso un percorso strutturato e si sente più partecipe e sostenuta. Ora occorre definire il mantenimento e il follow-up nel tempo, consolidare il team multidisciplinare, mantenere una sorveglianza accurata di sintomi, funzionalità, stato dentale ed esami mirati e affrontare con chiarezza gli aspetti di family mapping e consulenza genetica legati all’ereditarietà X‑Linked.'
+          }
+        },
+        snodi: [
+          {
+            snodoId: 'e-s5-1',
+            snodoCode: '5.1',
+            domainKey: 'followup',
+            domainLabel: 'Scelta Mantenimento / Follow-up',
+            valueWeight: 100,
+            tiles: [
+              {
+                id: 'S5-FOL-A',
+                headline: 'Impostare un piano di follow-up e monitoraggio regolare e strutturato',
+                bodyText: 'Definire controlli clinici periodici, valutazione funzionale (es. test del cammino dei 6 minuti) e qualità di vita (BPI e WOMAC), monitoraggio dentale (rischio parodontale e ortopantomografia) e imaging mirato secondo indicazione.',
+                isCorrect: true,
+                qualityDeltaPct: 0,
+                valuePoints: 100,
+                feedbackText: 'Corretto. Il follow-up e il monitoraggio regolari sono necessari per sostenere i benefici, intercettare complicanze/eventi avversi e prevenire la progressione.'
+              },
+              {
+                id: 'S5-FOL-B',
+                headline: 'Non programmare controlli regolari, rimandando solo a eventuali urgenze',
+                bodyText: 'Rinunciare al follow-up strutturato.',
+                isCorrect: false,
+                qualityDeltaPct: -15,
+                valuePoints: 0,
+                feedbackText: 'Errato (-15% CQ). Il monitoraggio regolare è parte integrante della gestione per prevenire peggioramenti e complicanze.'
+              },
+              {
+                id: 'S5-FOL-C',
+                headline: 'Omettere il monitoraggio dentale e la valutazione di funzionalità e qualità di vita',
+                bodyText: 'Trascurare aree rilevanti del follow-up.',
+                isCorrect: false,
+                qualityDeltaPct: -10,
+                valuePoints: 0,
+                feedbackText: 'Errato (-10% CQ). Il follow-up include valutazione dentale (rischio parodontale, ortopantomografia), funzionalità (6MWT) e qualità di vita (BPI, WOMAC).'
+              },
+              {
+                id: 'S5-FOL-D',
+                headline: 'Prescrivere esami di imaging avanzato a intervalli fissi senza indicazioni cliniche',
+                bodyText: 'Non seguire i criteri del piano.',
+                isCorrect: false,
+                qualityDeltaPct: -10,
+                valuePoints: 0,
+                feedbackText: 'Errato (-10% CQ). L’imaging (come RMI del cranio, ecocardiogramma, ecografia renale) ha indicazioni mirate in base alle condizioni cliniche.'
+              }
+            ]
+          },
+          {
+            snodoId: 'e-s5-2',
+            snodoCode: '5.2',
+            domainKey: 'gestionale',
+            domainLabel: 'Scelta Gestionale',
+            valueWeight: 100,
+            tiles: [
+              {
+                id: 'S5-GES-A',
+                headline: 'Mantenere il coordinamento multidisciplinare guidato dallo specialista esperto in malattie metaboliche dell’osso',
+                bodyText: 'Assicurare revisioni periodiche coordinate e continuità nella transizione verso le fasi successive di vita.',
+                isCorrect: true,
+                qualityDeltaPct: 0,
+                valuePoints: 100,
+                feedbackText: 'Corretto. I pazienti devono essere rivisti regolarmente da un team multidisciplinare coordinato da un esperto in malattie metaboliche dell’osso, con continuità di assistenza anche verso l’età adulta.'
+              },
+              {
+                id: 'S5-GES-B',
+                headline: 'Interrompere il raccordo tra specialista di riferimento e altri professionisti coinvolti',
+                bodyText: 'Frammentare il mantenimento.',
+                isCorrect: false,
+                qualityDeltaPct: -10,
+                valuePoints: 0,
+                feedbackText: 'Errato (-10% CQ). La frammentazione e la mancanza di coordinamento espongono a discontinuità e cali di aderenza.'
+              },
+              {
+                id: 'S5-GES-C',
+                headline: 'Considerare concluso il percorso di cura',
+                bodyText: 'Ritenere non più necessaria la presa in carico.',
+                isCorrect: false,
+                qualityDeltaPct: -15,
+                valuePoints: 0,
+                feedbackText: 'Errato (-15% CQ). L’XLH dura tutta la vita e richiede assistenza continuativa.'
+              },
+              {
+                id: 'S5-GES-D',
+                headline: 'Non adattare la rete assistenziale ai nuovi bisogni emergenti nel tempo',
+                bodyText: 'Mantenere un assetto rigido.',
+                isCorrect: false,
+                qualityDeltaPct: -5,
+                valuePoints: 0,
+                feedbackText: 'Errato (-5% CQ). Le aree coinvolte nella cura si modulano in base alle esigenze individuali nel tempo.'
+              }
+            ]
+          },
+          {
+            snodoId: 'e-s5-3',
+            snodoCode: '5.3',
+            domainKey: 'investigativa',
+            domainLabel: 'Scelta Investigativa / Esaminazione',
+            valueWeight: 100,
+            tiles: [
+              {
+                id: 'S5-INV-A',
+                headline: 'Aggiornare regolarmente la storia clinica su tutti i domini sintomatologici e funzionali',
+                bodyText: 'Indagare periodicamente cefalea, manifestazioni orali, fatigue, pseudofratture, dolore muscoloscheletrico, udito, neurologia e funzionalità quotidiana.',
+                isCorrect: true,
+                qualityDeltaPct: 0,
+                valuePoints: 100,
+                feedbackText: 'Corretto. L’esame clinico nel follow-up include la raccolta periodica della storia clinica di questi sintomi e la valutazione funzionale/uditiva/neurologica.'
+              },
+              {
+                id: 'S5-INV-B',
+                headline: 'Chiedere solo se il dolore è cambiato nell’ultima settimana',
+                bodyText: 'Trascurare fatigue, sintomi orali, uditivi o neurologici.',
+                isCorrect: false,
+                qualityDeltaPct: -10,
+                valuePoints: 0,
+                feedbackText: 'Errato (-10% CQ). Il monitoraggio clinico richiede un’indagine sistematica su più domini sintomatologici e funzionali.'
+              },
+              {
+                id: 'S5-INV-C',
+                headline: 'Non valutare nel tempo l’impatto su mobilità e attività quotidiane',
+                bodyText: 'Ignorare la funzionalità.',
+                isCorrect: false,
+                qualityDeltaPct: -10,
+                valuePoints: 0,
+                feedbackText: 'Errato (-10% CQ). Dolore, rigidità e limitazioni funzionali incidono sulla vita quotidiana e vanno monitorati nel tempo.'
+              },
+              {
+                id: 'S5-INV-D',
+                headline: 'Trascurare i sintomi riferiti tra un controllo e l’altro',
+                bodyText: 'Sottovalutare l’anamnesi di aggiornamento.',
+                isCorrect: false,
+                qualityDeltaPct: -5,
+                valuePoints: 0,
+                feedbackText: 'Errato (-5% CQ). La raccolta della storia clinica dei sintomi è parte centrale del piano di follow-up.'
+              }
+            ]
+          },
+          {
+            snodoId: 'e-s5-4',
+            snodoCode: '5.4',
+            domainKey: 'diagnostica',
+            domainLabel: 'Scelta Diagnostica',
+            valueWeight: 100,
+            tiles: [
+              {
+                id: 'S5-DIA-A',
+                headline: 'Eseguire monitoraggio biochimico/speciale e imaging mirato secondo le indicazioni del piano',
+                bodyText: 'Valutare parametri di monitoraggio/laboratorio e attivare l’imaging appropriato (es. RMI del cranio se indicato da segni/sintomi neurologici o cefalea ricorrente/declino cognitivo/craniosinostosi, ecocardiogramma se ipertensione, ecografia renale se nefrocalcitosi/ipercalciuria).',
+                isCorrect: true,
+                qualityDeltaPct: 0,
+                valuePoints: 100,
+                feedbackText: 'Corretto. Il piano di follow-up definisce esami speciali e imaging mirato in base alle condizioni cliniche.'
+              },
+              {
+                id: 'S5-DIA-B',
+                headline: 'Non eseguire alcun controllo biochimico o strumentale di monitoraggio',
+                bodyText: 'Rinunciare a verifiche oggettive.',
+                isCorrect: false,
+                qualityDeltaPct: -10,
+                valuePoints: 0,
+                feedbackText: 'Errato (-10% CQ). Il monitoraggio periodico consente di seguire l’andamento clinico e intercettare complicanze o eventi avversi.'
+              },
+              {
+                id: 'S5-DIA-C',
+                headline: 'Richiedere ecografia renale o ecocardiogramma senza legarli alle rispettive indicazioni',
+                bodyText: 'Prescrivere esami fuori criterio.',
+                isCorrect: false,
+                qualityDeltaPct: -5,
+                valuePoints: 0,
+                feedbackText: 'Errato (-5% CQ). Nel piano di follow-up l’ecocardiogramma è indicato in caso di ipertensione e l’ecografia renale in caso di nefrocalcitosi/ipercalciuria.'
+              },
+              {
+                id: 'S5-DIA-D',
+                headline: 'Interpretare un singolo valore isolato senza considerare il quadro complessivo',
+                bodyText: 'Trarre conclusioni parziali.',
+                isCorrect: false,
+                qualityDeltaPct: -5,
+                valuePoints: 0,
+                feedbackText: 'Errato (-5% CQ). L’inquadramento richiede sempre la lettura integrata di clinica, laboratorio, genetica ed eventuali indagini strumentali.'
+              }
+            ]
+          },
+          {
+            snodoId: 'e-s5-5',
+            snodoCode: '5.5',
+            domainKey: 'comunicazionale',
+            domainLabel: 'Scelta Comunicazionale',
+            valueWeight: 100,
+            tiles: [
+              {
+                id: 'S5-COM-A',
+                headline: 'Promuovere family mapping e consulenza genetica / family planning con corretta informazione X‑Linked',
+                bodyText: 'Raccomandare lo screening dei familiari a rischio (chiarendo che per una donna affetta sia figli maschi sia figlie femmine possono essere a rischio di trasmissione legata all’X) e offrire consulenza genetica per il family planning.',
+                isCorrect: true,
+                qualityDeltaPct: 0,
+                valuePoints: 100,
+                feedbackText: 'Corretto. Il family mapping favorisce diagnosi precoce, avvio tempestivo della terapia e family planning accurato, con consulenza genetica per chi pianifica una gravidanza.'
+              },
+              {
+                id: 'S5-COM-B',
+                headline: 'Affermare che una madre affetta da XLH non può mai trasmettere la mutazione ai figli maschi',
+                bodyText: 'Fornire un’informazione errata sull’ereditarietà X‑Linked.',
+                isCorrect: false,
+                qualityDeltaPct: -10,
+                valuePoints: 0,
+                feedbackText: 'Errato (-10% CQ). Nelle femmine affette da XLH la trasmissione legata all’X può interessare sia i figli maschi sia le figlie femmine, e tutti i familiari a rischio vanno sottoposti a screening.'
+              },
+              {
+                id: 'S5-COM-C',
+                headline: 'Omettere il tema dello screening familiare e della consulenza genetica',
+                bodyText: 'Non informare sulle implicazioni familiari.',
+                isCorrect: false,
+                qualityDeltaPct: -10,
+                valuePoints: 0,
+                feedbackText: 'Errato (-10% CQ). Le linee guida raccomandano lo screening dei familiari a rischio e l’offerta di consulenza genetica.'
+              },
+              {
+                id: 'S5-COM-D',
+                headline: 'Sostenere che la storia familiare e lo screening non abbiano impatto sulla diagnosi precoce',
+                bodyText: 'Sottovalutare il family mapping.',
+                isCorrect: false,
+                qualityDeltaPct: -10,
+                valuePoints: 0,
+                feedbackText: 'Errato (-10% CQ). La storia familiare e lo screening consentono diagnosi più precoci ed evitano ritardi diagnostici e terapeutici.'
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  };
+
   return {
-    CASES_REGISTRY: [CASO_202_MATTEO]
+    CASES_REGISTRY: [CASO_202_MATTEO, CASO_202_ELENA]
   };
 });
